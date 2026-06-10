@@ -6,6 +6,7 @@ const translation: Translation = {
         archive: "Archive",
         tech: "Tech",
         bookReview: "Book Review",
+        articles: "Articles",
         about: "About",
         friends: "Friends",
     },
@@ -15,6 +16,7 @@ const translation: Translation = {
             archive: "Archive",
             tech: "Tech Articles",
             bookReview: "Book Review",
+            articles: "Articles",
             about: "About",
             friends: "Friends",
         },
@@ -23,6 +25,7 @@ const translation: Translation = {
             archive: "Total of {count} articles",
             tech: "Notes on tech learning and thinking",
             bookReview: "Read ten thousand books, travel ten thousand miles",
+            articles: "Curated good reads from the web",
             about: "A minimalist blog template",
             friends: "Interesting Souls",
         }

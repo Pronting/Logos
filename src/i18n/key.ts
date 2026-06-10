@@ -4,6 +4,7 @@ export interface Translation {
         archive: string;
         tech: string;
         bookReview: string;
+        articles: string;
         about: string;
         friends: string;
     };
@@ -13,6 +14,7 @@ export interface Translation {
             archive: string;
             tech: string;
             bookReview: string;
+            articles: string;
             about: string;
             friends: string;
         };
@@ -21,6 +23,7 @@ export interface Translation {
             archive: string;
             tech: string;
             bookReview: string;
+            articles: string;
             about: string;
             friends: string;
         };

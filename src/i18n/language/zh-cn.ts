@@ -6,6 +6,7 @@ const translation: Translation = {
         archive: "归档",
         tech: "技术文章",
         bookReview: "书评",
+        articles: "好文",
         about: "关于",
         friends: "友链",
     },
@@ -15,6 +16,7 @@ const translation: Translation = {
             archive: "文章归档",
             tech: "技术文章",
             bookReview: "书评",
+            articles: "好文",
             about: "关于",
             friends: "友链",
         },
@@ -23,6 +25,7 @@ const translation: Translation = {
             archive: "共 {count} 篇文章",
             tech: "记录技术学习与思考",
             bookReview: "读万卷书，行万里路",
+            articles: "分享互联网上的好文章",
             about: "一个极简的Blog模板",
             friends: "有趣的灵魂",
         }

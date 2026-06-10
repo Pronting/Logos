@@ -1,0 +1,26 @@
+---
+import MainPageLayout from '@layouts/MainPageLayout.astro';
+import Cover from '@components/Cover.astro';
+import FabMenu from '@components/control/FabMenu.astro';
+
+import { siteConfig } from '@/config';
+import { i18n } from "astro:config/client";
+
+import i18nit from '@i18n/translation'
+
+const currentLang = Astro.currentLocale || i18n!.defaultLocale;
+const t = i18nit(currentLang);
+
+export async function getStaticPaths() {
+    return i18n?.locales.map(locale => ({
+        params: { locale: locale == i18n?.defaultLocale ? undefined : (locale as string) }
+    }));
+}
+
+const pageTitle = `${t("header.articles")} - ${siteConfig.title}`;
+---
+
+<MainPageLayout title={pageTitle} lang={currentLang}>
+    <Cover title={t("cover.title.articles")} subTitle={t("cover.subTitle.articles")} />
+    <FabMenu showBackBottom={true} />
+</MainPageLayout>
