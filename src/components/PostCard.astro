@@ -71,8 +71,17 @@ const { remarkPluginFrontmatter } = await render(entry);
                 <span class="py-1 px-1">{remarkPluginFrontmatter.minutes || 0} {t("pagecard.minutes")}</span>
             </p>
             <p class="flex items-center whitespace-nowrap mr-2">
-                <Icon name="fa6-solid:hashtag" class="mr-1"></Icon> 
-                <a href={getRelativeLocaleUrl(currentLang, `/archives/?category=${entry.data.category}`)} class="category-tag">{entry.data.category || t("pagecard.uncategorized")}</a>
+                <Icon name="fa6-solid:hashtag" class="mr-1"></Icon>
+                {entry.data.tags && entry.data.tags.length > 0 ? (
+                    entry.data.tags.map((tag: string, i: number) => (
+                        <>
+                            {i > 0 && <span class="mx-0.5">·</span>}
+                            <a href={getRelativeLocaleUrl(currentLang, `/archives/?tag=${encodeURIComponent(tag)}`)} class="tag-pill">{tag}</a>
+                        </>
+                    ))
+                ) : (
+                    <span class="tag-pill">{t("pagecard.uncategorized")}</span>
+                )}
             </p>
         </div>
     </div>
@@ -86,15 +95,15 @@ const { remarkPluginFrontmatter } = await render(entry);
 .hover-scale:hover {
   transform: scale(1.05);
 }
-.category-tag {
+.tag-pill {
   transition: all 0.3s ease;
   background-color: transparent;
   display: inline-block;
   border-radius: 0.25rem;
-  padding: 0.25rem 0.25rem; 
+  padding: 0.25rem 0.25rem;
 }
 
-.category-tag:hover {
+.tag-pill:hover {
   color: var(--link-color);
   background-color: var(--button-hover-color);
   text-shadow: 0.5px 0 0 currentColor, -0.5px 0 0 currentColor;

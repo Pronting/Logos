@@ -7,6 +7,7 @@ const translation: Translation = {
         tech: "技术文章",
         bookReview: "书评",
         bookshelf: "书架",
+        articles: "好文",
         about: "关于",
         friends: "友链",
     },
@@ -17,6 +18,7 @@ const translation: Translation = {
             tech: "技术文章",
             bookReview: "书评",
             bookshelf: "书架",
+            articles: "好文",
             about: "关于",
             friends: "友链",
         },
@@ -26,12 +28,13 @@ const translation: Translation = {
             tech: "记录技术学习与思考",
             bookReview: "读万卷书，行万里路",
             bookshelf: "博学而笃志，切问而近思",
+            articles: "分享互联网上的好文章",
             about: "一个极简的Blog模板",
             friends: "有趣的灵魂",
         }
     },
     toc: "目录",
-    category: "分类",
+    tag: "标签",
     pageNavigation: {
         previous: "上一页",
         next: "下一页",
@@ -146,6 +149,13 @@ const translation: Translation = {
         light: "切换到 浅色 模式",
         dark: "切换到 深色 模式",
         system: "切换到 跟随系统 模式"
+    },
+    profileCard: {
+        title: "关于我",
+        contact: "联系方式",
+        copy: "复制",
+        copySuccess: "已复制到剪贴板",
+        copyFailed: "复制失败，请手动复制",
     }
 }
 

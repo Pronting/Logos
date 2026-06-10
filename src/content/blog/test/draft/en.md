@@ -2,7 +2,7 @@
 title: Test Draft
 pubDate: 2024-12-31
 description: Article functionality testing
-category: Test
+tags: [Test]
 image: ""
 draft: true
 slugId: momo/test/draft

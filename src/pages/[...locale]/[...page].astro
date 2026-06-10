@@ -1,7 +1,8 @@
 ---
 import MainPageLayout from '@layouts/MainPageLayout.astro';
-import Cover from '@components/Cover.astro';
+import Hero from '@components/Hero.astro';
 import PostPage from '@components/PostPage.astro';
+import ProfileCard from '@components/ProfileCard.astro';
 import Navi from '@components/control/Navi.astro';
 import FabMenu from '@components/control/FabMenu.astro';
 
@@ -65,8 +66,19 @@ const pageTitle = `${siteConfig.title} - ${siteConfig.subTitle}`;
 ---
 
 <MainPageLayout title={pageTitle} lang={currentLang}>
-    <Cover title={t("cover.title.home")} subTitle={t("cover.subTitle.home")} />
-    <PostPage page={page} />
-    <Navi page={page} />
+    <Hero />
+    <div class="home-layout mx-auto w-full max-w-[var(--page-width)] md:max-w-[1080px]">
+        <div class="grid grid-cols-1 md:grid-cols-[280px_minmax(0,1fr)] gap-0 md:gap-6 md:items-start">
+            <aside class="home-aside hidden md:block">
+                <div class="md:sticky md:top-24">
+                    <ProfileCard />
+                </div>
+            </aside>
+            <div class="home-main min-w-0">
+                <PostPage page={page} />
+                <Navi page={page} />
+            </div>
+        </div>
+    </div>
     <FabMenu showBackBottom={true} />
 </MainPageLayout>

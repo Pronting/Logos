@@ -7,6 +7,7 @@ const translation: Translation = {
         tech: "Tech",
         bookReview: "Book Review",
         bookshelf: "Bookshelf",
+        articles: "Articles",
         about: "About",
         friends: "Friends",
     },
@@ -17,6 +18,7 @@ const translation: Translation = {
             tech: "Tech Articles",
             bookReview: "Book Review",
             bookshelf: "Bookshelf",
+            articles: "Articles",
             about: "About",
             friends: "Friends",
         },
@@ -26,12 +28,13 @@ const translation: Translation = {
             tech: "Notes on tech learning and thinking",
             bookReview: "Read ten thousand books, travel ten thousand miles",
             bookshelf: "Read widely, think deeply",
+            articles: "Curated good reads from the web",
             about: "A minimalist blog template",
             friends: "Interesting Souls",
         }
     },
     toc: "Contents",
-    category: "Category",
+    tag: "Tags",
     pageNavigation: {
         previous: "Prev",
         next: "Next",
@@ -146,6 +149,13 @@ const translation: Translation = {
         light: "Switch to Light Mode",
         dark: "Switch to Dark Mode",
         system: "Switch to System Mode"
+    },
+    profileCard: {
+        title: "About Me",
+        contact: "Contact",
+        copy: "Copy",
+        copySuccess: "Copied to clipboard",
+        copyFailed: "Copy failed, please copy manually",
     }
 }
 

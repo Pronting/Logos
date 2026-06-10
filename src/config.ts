@@ -34,10 +34,32 @@ export const siteConfig: SiteConfig = {
 
 export const profileConfig: ProfileConfig = {
     avatar: "assets/Motues.jpg", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
-    name: "Motues",
+    name: "Pronting",
     description: "Life is colorful!",
-    indexPage: "https://www.motues.top",
+    motto: "持续发光发热",
+    indexPage: "https://github.com/Pronting",
     startYear: 2024,
+    links: [
+        {
+            name: "GitHub",
+            url: "https://github.com/Pronting/Logos",
+            icon: "fa6-brands:github",
+            color: "#181717",
+        },
+        {
+            name: "博客园",
+            url: "https://www.cnblogs.com/pronting",
+            icon: "fa6-solid:newspaper",
+            color: "#2e7d32",
+        },
+        {
+            name: "realpront@outlook.com",
+            url: "realpront@outlook.com",
+            icon: "fa6-solid:envelope",
+            color: "#0078d4",
+            copyable: true,
+        },
+    ],
 }
 
 export const licenseConfig: LicenseConfig = {

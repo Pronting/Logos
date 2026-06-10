@@ -11,17 +11,51 @@
   export let currentLang = "zh-cn";
   export let defaultLocale = "zh-cn";
 
-  let selectedCategories = [];
+  // 哨兵值：表示该文章无任何 tag
+  const UNTAGGED = 'undefined';
+
+  /**
+   * 获取单篇文章的 tag 列表。
+   * - 兼容旧数据：tags 缺失时返回空
+   * - 空数组也归一为空，由调用方决定如何处理 UNTAGGED
+   */
+  function getPostTags(post) {
+    return Array.isArray(post.data.tags) ? post.data.tags : [];
+  }
+
+  let selectedTags = [];
   const t = i18nit(currentLang);
 
-  // 提取所有分类并去重
-  $: categories = [...new Set(sortedPosts.map(post => post.data.category || 'undefined'))].sort();
+  // 统计每个 tag 的文章数量，并按数量降序排列
+  // 当数量相同时，按 tag 名称 localeCompare 升序作为稳定排序
+  $: tagCounts = (() => {
+    const counts = new Map();
+    for (const post of sortedPosts) {
+      const tags = getPostTags(post);
+      if (tags.length === 0) {
+        counts.set(UNTAGGED, (counts.get(UNTAGGED) || 0) + 1);
+      } else {
+        for (const tag of tags) {
+          counts.set(tag, (counts.get(tag) || 0) + 1);
+        }
+      }
+    }
+    return counts;
+  })();
 
-  // 响应式过滤逻辑 - 特殊处理 undefined 情况
-  $: filteredPosts = selectedCategories.length > 0
+  $: sortedTags = [...tagCounts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([tag, count]) => ({ tag, count }));
+
+  // 过滤逻辑：选中任一 tag 即保留（多 tag 取并集）
+  $: filteredPosts = selectedTags.length > 0
     ? sortedPosts.filter(post => {
-        const postCat = post.data.category || 'undefined';
-        return selectedCategories.includes(postCat);
+        const tags = getPostTags(post);
+        // 无 tag 的文章只在用户选中 UNTAGGED 时被保留
+        if (tags.length === 0) {
+          return selectedTags.includes(UNTAGGED);
+        }
+        return tags.some(t => selectedTags.includes(t));
       })
     : sortedPosts;
 
@@ -36,33 +70,33 @@
   $: years = Object.keys(postsByYear).sort((a, b) => b - a);
 
   onMount(() => {
-    // 获取初始 URL 参数 - 特殊处理 undefined
+    // 获取初始 URL 参数 - 特殊处理 UNTAGGED
     const params = new URLSearchParams(window.location.search);
-    const categoryParam = params.get('category');
-    
-    // 当参数为 'undefined' 时，专门用于显示未分类文章
-    if (categoryParam === 'undefined') {
-      selectedCategories = ['undefined'];
-    } else if (categoryParam && categoryParam !== 'null') {
-      selectedCategories = categoryParam.split(',');
+    const tagParam = params.get('tag');
+
+    if (tagParam === UNTAGGED) {
+      selectedTags = [UNTAGGED];
+    } else if (tagParam) {
+      selectedTags = tagParam.split(',');
     }
 
     // 处理浏览器前进/后退
     const handlePopState = () => {
       const params = new URLSearchParams(window.location.search);
-      selectedCategories = params.get('category')?.split(',') || [];
+      const value = params.get('tag');
+      selectedTags = value ? value.split(',') : [];
     };
 
     window.addEventListener('popstate', handlePopState);
 
     const syncAsideHeight = () => {
       const mainContent = document.getElementById('archive-content');
-      const aside = document.getElementById('category-sidebar');
-      
+      const aside = document.getElementById('tag-sidebar');
+
       if (mainContent && aside) {
         const mainHeight = mainContent.offsetHeight;
         aside.style.height = `${mainHeight}px`;
-        
+
       }
     };
 
@@ -92,7 +126,7 @@
         window.removeEventListener('popstate', handlePopState);
         window.removeEventListener('resize', handleResize);
         clearTimeout(resizeTimer);
-        
+
         if (mutationObserver) {
             mutationObserver.disconnect();
         }
@@ -100,25 +134,25 @@
   });
 
   // 筛选点击逻辑
-  function toggleCategory(cat) {
-    if (cat === null) {
-      selectedCategories = []; // 点击“全部”则清空
+  function toggleTag(tag) {
+    if (tag === null) {
+      selectedTags = []; // 点击"全部"则清空
     } else {
-      if (selectedCategories.includes(cat)) {
+      if (selectedTags.includes(tag)) {
         // 如果已选中，则移除
-        selectedCategories = selectedCategories.filter(c => c !== cat);
+        selectedTags = selectedTags.filter(t => t !== tag);
       } else {
         // 如果未选中，则添加
-        selectedCategories = [...selectedCategories, cat];
+        selectedTags = [...selectedTags, tag];
       }
     }
 
     // 更新 URL，方便分享和刷新
     const url = new URL(window.location);
-    if (selectedCategories.length > 0) {
-      url.searchParams.set('category', selectedCategories.join(','));
+    if (selectedTags.length > 0) {
+      url.searchParams.set('tag', selectedTags.join(','));
     } else {
-      url.searchParams.delete('category');
+      url.searchParams.delete('tag');
     }
     window.history.replaceState({}, '', url);
   }
@@ -141,14 +175,14 @@
                 <div class="space-y-2">
                     {#each postsByYear[year] as post (post.id)}
                         <div animate:flip={{ duration: 600 }} in:fade={{ duration: 150 }} out:fade={{ duration: 150 }} >
-                            <a 
-                                href={getRelativeLocaleUrl(currentLang, `/blog/${post.id}`)} 
+                            <a
+                                href={getRelativeLocaleUrl(currentLang, `/blog/${post.id}`)}
                                 class="flex items-center gap-4 active:bg-[var(--button-hover-color)] hover:bg-[var(--button-hover-color)] p-2 rounded transition-all duration-200 group"
                             >
                                 <span class="text-[var(--text-color-70)] min-w-[80px] md:min-w-[120px]">
                                     {formatMonthDay(post.data.pubDate, currentLang)}
                                 </span>
-                                
+
                                 <span class="text-lg group-hover:pl-2 group-hover:text-[var(--link-color)] group-hover:font-bold transition-all duration-200 flex-1 group-active:text-[var(--link-color)]">
                                     {post.data.title}
                                     {#if post.isFallback}
@@ -158,9 +192,14 @@
                                     {/if}
                                 </span>
 
-                                <span class="hidden md:flex items-center font-mono text-sm text-[var(--text-color-70)]">
+                                <span class="hidden md:flex items-center font-mono text-sm text-[var(--text-color-70)] flex-wrap gap-1 justify-end">
                                     <Icon icon="fa6-solid:hashtag" class="mr-1" />
-                                    {post.data.category || t("pagecard.uncategorized")}
+                                    {#each getPostTags(post) as tag, i (tag + i)}
+                                        {#if i > 0}<span class="mx-0.5">·</span>{/if}
+                                        <span>{tag}</span>
+                                    {:else}
+                                        <span>{t("pagecard.uncategorized")}</span>
+                                    {/each}
                                 </span>
                             </a>
                         </div>
@@ -171,26 +210,27 @@
     </div>
 </div>
 
-    <aside 
-        id="category-sidebar"
-        class="hidden lg:block absolute left-[var(--toc-offset-left)] top-70 bottom-0 w-[var(--category-width)]">
+    <aside
+        id="tag-sidebar"
+        class="hidden lg:block absolute left-[var(--toc-offset-left)] top-70 bottom-0 w-[var(--tag-width)]">
         <div class="sticky top-24">
             <div class="flex items-center gap-2 text-[var(--text-color)] font-bold mb-4 border-b border-[var(--button-border-color)] pb-2 uppercase tracking-wider">
                 <Icon icon="fa6-solid:hashtag" class="text-xs" />
-                <span>{t("category")}</span>
+                <span>{t("tag")}</span>
             </div>
 
             <div class="flex flex-wrap gap-2">
-                
-                {#each categories as cat}
-                    <button 
-                        on:click={() => toggleCategory(cat)}
-                        class="px-3 py-1 text-xs rounded-md transition-all border
-                        {selectedCategories.includes(cat) 
-                            ? 'bg-[var(--link-color)] text-white border-[var(--link-color)]' 
+
+                {#each sortedTags as { tag, count } (tag)}
+                    <button
+                        on:click={() => toggleTag(tag)}
+                        class="px-3 py-1 text-xs rounded-md transition-all border inline-flex items-center gap-1.5
+                        {selectedTags.includes(tag)
+                            ? 'bg-[var(--link-color)] text-white border-[var(--link-color)]'
                             : 'hover:border-[var(--link-color)] border-[var(--button-border-color)] text-[var(--text-color)]'}"
                     >
-                        {cat === 'undefined' ? t("pagecard.uncategorized") : cat}
+                        <span>{tag === UNTAGGED ? t("pagecard.uncategorized") : tag}</span>
+                        <span class="opacity-70 text-[10px] tabular-nums">({count})</span>
                     </button>
                 {/each}
             </div>

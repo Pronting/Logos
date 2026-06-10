@@ -5,6 +5,7 @@ export interface Translation {
         tech: string;
         bookReview: string;
         bookshelf: string;
+        articles: string;
         about: string;
         friends: string;
     };
@@ -15,6 +16,7 @@ export interface Translation {
             tech: string;
             bookReview: string;
             bookshelf: string;
+            articles: string;
             about: string;
             friends: string;
         };
@@ -24,12 +26,13 @@ export interface Translation {
             tech: string;
             bookReview: string;
             bookshelf: string;
+            articles: string;
             about: string;
             friends: string;
         };
     };
     toc:string;
-    category: string;
+    tag: string;
     pageNavigation: {
         previous: string;
         next: string;
@@ -144,5 +147,12 @@ export interface Translation {
         light: string;
         dark: string;
         system: string;
+    },
+    profileCard: {
+        title: string;
+        contact: string;
+        copy: string;
+        copySuccess: string;
+        copyFailed: string;
     }
 }

@@ -37,6 +37,7 @@ const archivesPage = getRelativeLocaleUrl(currentLang, "/archives/");
 const techPage = getRelativeLocaleUrl(currentLang, "/tech/");
 const bookReviewPage = getRelativeLocaleUrl(currentLang, "/book-review/");
 const bookshelfPage = getRelativeLocaleUrl(currentLang, "/bookshelf/");
+const articlesPage = getRelativeLocaleUrl(currentLang, "/articles/");
 const friendsPage = getRelativeLocaleUrl(currentLang, "/friends/");
 const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
 
@@ -148,6 +149,13 @@ if (profileConfig.indexPage) {
                   : 'hover:bg-[var(--button-hover-color)]'
               }`}>
               {t("header.bookshelf")}
+          <!-- 好文链接 -->
+          <a href={ articlesPage } class={`transition-colors rounded-lg px-3 py-1 mx-1 hover:text-current ${
+              Astro.url.pathname.startsWith('/articles')
+                  ? 'bg-[var(--button-hover-color)]'
+                  : 'hover:bg-[var(--button-hover-color)]'
+              }`}>
+              {t("header.articles")}
           </a>
           <!-- 关于链接 -->
           <a href={ aboutPage } class={`transition-colors rounded-lg px-3 py-1 mx-1 hover:text-current ${
@@ -171,7 +179,7 @@ if (profileConfig.indexPage) {
 <div id="mobile-menu-container" class="fixed inset-0 z-[100] hidden">
     <div id="mobile-menu-overlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300 ease-in-out"></div>
     
-    <div id="mobile-menu-drawer" class="absolute top-0 left-0 bottom-0 w-[70%] max-w-[300px] bg-[var(--bg-color)] shadow-2xl transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
+    <div id="mobile-menu-drawer" class="absolute top-0 left-0 bottom-0 w-[70%] max-w-[300px] bg-[var(--surface-color)] shadow-2xl transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
         
         <div class="flex items-center justify-between p-5 border-b border-[var(--button-border-color)]">
             <span class="text-xl font-bold header-logo">{ siteConfig.title }</span>
@@ -200,6 +208,9 @@ if (profileConfig.indexPage) {
             <a href={ bookshelfPage } class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[var(--button-hover-color)] hover:text-[var(--link-color)] transition-colors active:bg-[var(--button-hover-color)] active:text-[var(--link-color)]">
                 <Icon name="fa6-solid:bookmark" class="w-4 h-4 opacity-70" />
                 <span>{t("header.bookshelf")}</span>
+            <a href={ articlesPage } class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[var(--button-hover-color)] hover:text-[var(--link-color)] transition-colors active:bg-[var(--button-hover-color)] active:text-[var(--link-color)]">
+                <Icon name="fa6-solid:bookmark" class="w-4 h-4 opacity-70" />
+                <span>{t("header.articles")}</span>
             </a>
             <a href={ aboutPage } class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[var(--button-hover-color)] hover:text-[var(--link-color)] transition-colors active:bg-[var(--button-hover-color)] active:text-[var(--link-color)]">
                 <Icon name="fa6-solid:user" class="w-4 h-4 opacity-70" />

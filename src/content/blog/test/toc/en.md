@@ -2,7 +2,7 @@
 title: Test Directory
 pubDate: 2025-09-19
 description: Article Functionality Testing
-category: Test
+tags: [Test]
 image: ""
 draft: true
 slugId: momo/test/toc

@@ -2,7 +2,7 @@
 title: Momo Configuration Guide
 pubDate: 2025-09-28
 description: Website Configuration
-category: Instruction
+tags: [Instruction]
 image: ""
 draft: false
 slugId: momo/intro/config

@@ -2,7 +2,7 @@
 title: Test Alert
 pubDate: 2025-09-18
 description: Article functionality testing
-category: Test
+tags: [Test]
 image: ""
 draft: true
 slugId: momo/test/alert

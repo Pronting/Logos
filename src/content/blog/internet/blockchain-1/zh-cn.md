@@ -2,7 +2,7 @@
 title: BRICS区块链比赛流程
 pubDate: 2023-09-24
 description: 区块链比赛流程
-category: 区块链
+tags: [区块链]
 image: ""
 draft: false
 slugId: momo/intro/comment
