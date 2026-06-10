@@ -30,8 +30,4 @@ pnpm-debug.log*
 # ai
 .claude
 .spec-workflow
-
-# blog
-
-src/content/blog/internet
-src/content/blog/book
+CLAUDE.md
