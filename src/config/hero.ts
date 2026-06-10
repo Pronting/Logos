@@ -16,7 +16,7 @@ export interface HeroConfig {
 
 export const heroConfig: HeroConfig = {
   greeting: "你好，我是",
-  name: "Pronting",
+  name: "pront",
   motto: "持续发光发热",
   tags: ["开源贡献者", "技术写作者", "终身学习者"],
 };

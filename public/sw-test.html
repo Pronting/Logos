@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Worker 图片缓存测试</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .test-image { max-width: 200px; margin: 10px; border: 1px solid #ccc; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button { padding: 10px 20px; margin: 10px 0; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Service Worker 图片缓存测试</h1>
+
+    <div id="sw-status" class="status info">检查 Service Worker 状态...</div>
+
+    <h2>测试图片</h2>
+    <div id="images"></div>
+
+    <h2>缓存状态</h2>
+    <pre id="cache-status">检查中...</pre>
+
+    <button onclick="clearCache()">清除缓存</button>
+    <button onclick="reloadImages()">重新加载图片</button>
+
+    <script>
+        const TEST_IMAGES = [
+            { url: 'https://pront-base-1318237185.cos.ap-guangzhou.myqcloud.com/20260610213755270.png', name: 'COS 图片 1' },
+            { url: 'https://pront-base-1318237185.cos.ap-guangzhou.myqcloud.com/20260610214309991.png', name: 'COS 图片 2' },
+            { url: 'https://avatars.githubusercontent.com/u/44914786', name: 'GitHub 头像' },
+        ];
+
+        // 检查 SW 状态
+        async function checkSWStatus() {
+            const statusEl = document.getElementById('sw-status');
+
+            if (!('serviceWorker' in navigator)) {
+                statusEl.className = 'status error';
+                statusEl.textContent = '❌ 浏览器不支持 Service Worker';
+                return;
+            }
+
+            const reg = await navigator.serviceWorker.getRegistration();
+            if (reg && reg.active) {
+                statusEl.className = 'status success';
+                statusEl.textContent = `✅ Service Worker 已激活 (${reg.active.scriptURL})`;
+            } else {
+                statusEl.className = 'status error';
+                statusEl.textContent = '❌ Service Worker 未激活';
+            }
+        }
+
+        // 加载测试图片
+        function loadImages() {
+            const container = document.getElementById('images');
+            container.innerHTML = '';
+
+            TEST_IMAGES.forEach(img => {
+                const div = document.createElement('div');
+                div.style.display = 'inline-block';
+                div.style.verticalAlign = 'top';
+                div.style.textAlign = 'center';
+
+                const imgEl = document.createElement('img');
+                imgEl.src = img.url;
+                imgEl.alt = img.name;
+                imgEl.className = 'test-image';
+                imgEl.loading = 'lazy';
+
+                const label = document.createElement('div');
+                label.textContent = img.name;
+                label.style.fontSize = '12px';
+
+                div.appendChild(imgEl);
+                div.appendChild(label);
+                container.appendChild(div);
+            });
+        }
+
+        // 检查缓存状态
+        async function checkCacheStatus() {
+            const statusEl = document.getElementById('cache-status');
+
+            try {
+                const cacheNames = await caches.keys();
+                const result = {};
+
+                for (const name of cacheNames) {
+                    const cache = await caches.open(name);
+                    const keys = await cache.keys();
+                    result[name] = {
+                        count: keys.length,
+                        urls: keys.map(k => k.url)
+                    };
+                }
+
+                statusEl.textContent = JSON.stringify(result, null, 2);
+            } catch (e) {
+                statusEl.textContent = 'Error: ' + e.message;
+            }
+        }
+
+        // 清除缓存
+        async function clearCache() {
+            const cacheNames = await caches.keys();
+            for (const name of cacheNames) {
+                await caches.delete(name);
+            }
+            alert('缓存已清除');
+            checkCacheStatus();
+        }
+
+        // 重新加载图片
+        function reloadImages() {
+            loadImages();
+            setTimeout(checkCacheStatus, 2000);
+        }
+
+        // 初始化
+        checkSWStatus();
+        loadImages();
+        setTimeout(checkCacheStatus, 3000);
+
+        // 定期刷新缓存状态
+        setInterval(checkCacheStatus, 5000);
+    </script>
+</body>
+</html>

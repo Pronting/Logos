@@ -4,20 +4,25 @@ import { i18n } from "astro:config/client";
 
 import type { BookEntry, BookFilter, BookMeta, BookRating, BookReviewLink } from "@/types/book";
 
+/**
+ * 把 CollectionEntry 转成轻量 BookMeta，传给客户端组件。
+ */
 export function toBookMeta(
     entry: CollectionEntry<"books">,
     reviewLinks?: BookReviewLink[],
 ): BookMeta {
     const data = entry.data;
-    // 去掉 locale 后缀，得到纯 slug（如 "example-book/zh-cn" → "example-book"）
-    const slug = entry.id.replace(/\/[^\/]+$/, "");
+    // 处理 tags：支持逗号分隔的标签字符串，如 "心理学,个人成长" → ["心理学", "个人成长"]
+    const tags = (data.tags ?? []).flatMap((tag) =>
+        tag.split(",").map((t) => t.trim()).filter(Boolean)
+    );
     return {
         id: entry.id,
-        slug,
+        slug: entry.id,
         title: data.title,
         author: data.author,
         cover: data.cover ?? "",
-        tags: data.tags ?? [],
+        tags,
         rating: data.rating,
         summary: data.summary ?? "",
         readDate: data.readDate ?? null,
@@ -28,6 +33,11 @@ export function toBookMeta(
     };
 }
 
+/**
+ * 加载某一语言下的所有书籍。
+ * - 默认语言走 fallback 策略
+ * - 按 pinTop 降序 + readDate 降序排列
+ */
 export async function getBooks(lang: string): Promise<BookEntry[]> {
     const targetLang = lang || i18n.defaultLocale;
     const all = await getCollection(
@@ -67,31 +77,10 @@ export async function getBooks(lang: string): Promise<BookEntry[]> {
     return result;
 }
 
-export function filterBooks(books: BookEntry[], filter: BookFilter): BookEntry[] {
-    const q = (filter.q ?? "").trim().toLowerCase();
-    const tag = filter.tag ?? "all";
-    const rating = filter.rating ?? "all";
-
-    return books.filter((book) => {
-        const data = book.data;
-
-        if (q) {
-            const haystack = `${data.title} ${data.author}`.toLowerCase();
-            if (!haystack.includes(q)) return false;
-        }
-
-        if (tag !== "all" && !data.tags?.includes(tag)) {
-            return false;
-        }
-
-        if (rating !== "all" && data.rating !== (rating as BookRating)) {
-            return false;
-        }
-
-        return true;
-    });
-}
-
+/**
+ * 加载某一语言下的所有书评文章。
+ * 与 getBooks 相同的 locale fallback 策略。
+ */
 export async function getBookReviews(
     lang: string,
 ): Promise<CollectionEntry<"bookReview">[]> {
@@ -133,6 +122,10 @@ export async function getBookReviews(
     return result;
 }
 
+/**
+ * 构建书籍 slug → 书评链接的映射（一对多）。
+ * 返回 Map<bookSlug, BookReviewLink[]>
+ */
 export async function buildBookReviewMap(
     lang: string,
 ): Promise<Map<string, BookReviewLink[]>> {
@@ -152,4 +145,37 @@ export async function buildBookReviewMap(
     }
 
     return map;
+}
+
+/**
+ * 纯函数：根据筛选条件过滤书籍。
+ * 后续扩展（tag 多选 / 排序 / 年份）都挂在这个函数上。
+ */
+export function filterBooks(books: BookEntry[], filter: BookFilter): BookEntry[] {
+    const q = (filter.q ?? "").trim().toLowerCase();
+    const tag = filter.tag ?? "all";
+    const rating = filter.rating ?? "all";
+
+    return books.filter((book) => {
+        const data = book.data;
+
+        if (q) {
+            const haystack = `${data.title} ${data.author}`.toLowerCase();
+            if (!haystack.includes(q)) return false;
+        }
+
+        if (tag !== "all") {
+            // 展开逗号分隔的标签后再匹配
+            const expandedTags = (data.tags ?? []).flatMap((t) =>
+                t.split(",").map((s) => s.trim()).filter(Boolean)
+            );
+            if (!expandedTags.includes(tag)) return false;
+        }
+
+        if (rating !== "all" && data.rating !== (rating as BookRating)) {
+            return false;
+        }
+
+        return true;
+    });
 }

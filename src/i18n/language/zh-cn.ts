@@ -161,6 +161,13 @@ const translation: Translation = {
         copy: "复制",
         copySuccess: "已复制到剪贴板",
         copyFailed: "复制失败，请手动复制",
+    },
+    column: {
+        title: "专栏",
+        articleCount: "{count} 篇文章",
+        noColumns: "暂无专栏",
+        backToList: "返回专栏",
+        series: "系列文章",
     }
 }
 
