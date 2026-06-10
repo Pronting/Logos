@@ -10,6 +10,7 @@
 
 /* 颜色变量 */
 /* --bg-color               页面背景色
+ * --surface-color          卡片/导航栏等浮层背景色
  * --text-color             文字基本色，通过透明度来控制颜色深浅，分为两类
  *     --text-color:        适用于标题、正文等需要突出显示的内容
  *     --text-color-70      适用于次要信息、辅助文本等不需要过于突出显示的内容
@@ -19,6 +20,7 @@
 */
 :root {
     --bg-color: #fbfbfb;
+    --surface-color: #ffffff;
     --text-color: #000000;
     --text-color-70: #4c4c4c;
     --shadow-color: rgba(0, 0, 0, 0.15);
@@ -33,7 +35,7 @@
     --danger-text-color: #4b1113;
     --danger-bg-color: #ffebec;
     --danger-border-color: #e13238;
-    
+
     /* 滚动条颜色 */
     --scrollbar-thumb: #c1c1c1;
     --scrollbar-thumb-hover: #a8a8a8;
@@ -44,27 +46,28 @@
   }
 
   [data-theme="dark"] {
-    --bg-color: #0a0a0a;
-    --text-color: #ffffff;
-    --text-color-70: #b5b5b5;
-    --shadow-color: rgba(255, 255, 255, 0.15);
-    --link-color: #57ace7;
-    --button-hover-color: #262626;
-    --button-border-color: #3d3d3d;
+    --bg-color: #0f1419;
+    --surface-color: #1c2430;
+    --text-color: #e6edf3;
+    --text-color-70: #8b949e;
+    --shadow-color: rgba(0, 0, 0, 0.4);
+    --link-color: #58a6ff;
+    --button-hover-color: #21262d;
+    --button-border-color: #30363d;
 
-    --warning-text-color: #f2d680;
-    --warning-bg-color: #332a00;
-    --warning-border-color: #ad8002;
+    --warning-text-color: #d29922;
+    --warning-bg-color: #282112;
+    --warning-border-color: #9e6a03;
 
     --danger-text-color: #f2a0a3;
     --danger-bg-color: #3b1d1e;
     --danger-border-color: #e13238;
-    
-    /* 滚动条颜色 */
-    --scrollbar-thumb: #4b4c4e;
-    --scrollbar-thumb-hover: #37383a;
-    --scrollbar-track: #1a202c;
 
-    --selection-bg-color: #2f5f80;
-    --selection-text-color: #ffffff;
+    /* 滚动条颜色 */
+    --scrollbar-thumb: #30363d;
+    --scrollbar-thumb-hover: #484f58;
+    --scrollbar-track: #161b22;
+
+    --selection-bg-color: #1f6feb;
+    --selection-text-color: #e6edf3;
   }
