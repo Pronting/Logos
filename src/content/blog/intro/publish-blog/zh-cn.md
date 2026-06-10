@@ -2,7 +2,7 @@
 title: 文章发布指南
 pubDate: 2025-09-29
 description: 网站配置
-category: 指南
+tags: [指南]
 image: ""
 draft: false
 slugId: momo/intro/publish
@@ -31,7 +31,7 @@ slugId: momo/intro/publish
 title: 文章标题
 pubDate: 2025-01-01
 description: 文章简短描述
-category: 分类
+tags: [分类]
 image: ""
 draft: false
 slugId: intro/publish
@@ -45,7 +45,7 @@ type: default
 | `title` | 文章标题 |
 | `pubDate` | 发布时间，格式为 `YYYY-MM-DD` |
 | `description` | 文章描述 |
-| `category` | 分类，不填时，默认为`未分类` |
+| `tags` | 标签，支持多个标签，使用 YAML 数组格式，如 `[指南, 入门]`。不填时，默认为`未分类` |
 | `image` | 封面图片，支持本地图片和外部图片；如果是本地图片，请使用对路径，相对于当前文件，比如`./images/cover.png` |
 | `draft` | 是否草稿，当文章处于草稿状态，发布的时候将不会显示在博客主页 |
 | `slugId` | 文章的ID，用于生成路由，每篇文章必须是唯一的，建议使用文章路径，比如`intro/publish` |
