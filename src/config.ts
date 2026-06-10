@@ -33,8 +33,8 @@ export const siteConfig: SiteConfig = {
 }
 
 export const profileConfig: ProfileConfig = {
-    avatar: "assets/Motues.jpg", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
-    name: "Pronting",
+    avatar: "assets/avatar.png", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
+    name: "pront",
     description: "Life is colorful!",
     motto: "持续发光发热",
     indexPage: "https://github.com/Pronting",
