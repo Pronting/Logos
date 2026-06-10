@@ -4,6 +4,7 @@ export interface Translation {
         archive: string;
         tech: string;
         bookReview: string;
+        bookshelf: string;
         articles: string;
         about: string;
         friends: string;
@@ -14,6 +15,7 @@ export interface Translation {
             archive: string;
             tech: string;
             bookReview: string;
+            bookshelf: string;
             articles: string;
             about: string;
             friends: string;
@@ -23,6 +25,7 @@ export interface Translation {
             archive: string;
             tech: string;
             bookReview: string;
+            bookshelf: string;
             articles: string;
             about: string;
             friends: string;
@@ -122,6 +125,24 @@ export interface Translation {
         errorCode: string;
         notice: string;
     },
+    bookshelf: {
+        searchPlaceholder: string;
+        filterTag: string;
+        filterRating: string;
+        ratingRecommended: string;
+        ratingNeutral: string;
+        ratingNotRecommended: string;
+        ratingAll: string;
+        tagAll: string;
+        close: string;
+        readDate: string;
+        readTime: string;
+        year: string;
+        author: string;
+        summary: string;
+        myReview: string;
+        noResults: string;
+    };
     themeInfo: {
         light: string;
         dark: string;
