@@ -50,19 +50,23 @@
   }
 
   function onKeydown(e: KeyboardEvent) {
-    if (e.key === "Escape") closeModal();
+    if (e.key === "Escape") {
+      closeModal();
+    }
   }
 
   function onBackdropClick(e: MouseEvent) {
     if (e.target === e.currentTarget) closeModal();
   }
 
-  // Lock body scroll when modal opens
+  // Lock scroll + register Escape listener when modal opens
   $effect(() => {
     if (book) {
       document.body.style.overflow = "hidden";
+      document.addEventListener("keydown", onKeydown);
       return () => {
         document.body.style.overflow = "";
+        document.removeEventListener("keydown", onKeydown);
       };
     }
   });
@@ -75,7 +79,6 @@
     role="dialog"
     aria-modal="true"
     aria-label={book.title}
-    onkeydown={onKeydown}
   >
     <!-- Backdrop -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
