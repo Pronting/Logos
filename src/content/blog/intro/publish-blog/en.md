@@ -35,12 +35,13 @@ image: ""
 draft: false
 slugId: intro/publish
 pinTop: 2
+type: default
 ---
 ```
 
-| Name | Function | 
-| :--- | :--- | 
-| `title` | Article title | 
+| Name | Function |
+| :--- | :--- |
+| `title` | Article title |
 | `pubDate` | Publication date, formatted as `YYYY-MM-DD` |
 | `description` | Article description |
 | `category` | Article category, if undefined, the article will be categorized as `Uncategorized` |
@@ -48,6 +49,7 @@ pinTop: 2
 | `draft` | Draft status; articles in draft mode won't appear on the blog homepage when published |
 | `slugId` | Article ID, used for generating routes. Each article must be unique. It is recommended to use article paths, such as `intro/publish`. |
 | `pinTop` | Whether to pin to the top; leaving this unset or setting it to a number less than 1 means not to pin; the higher the number, the higher the item appears in the layout |
+| `type` | Article type. Optional values: `default` (default, for tech/general articles) or `book` (for book reviews). If unset, defaults to `default`, showing under the "Tech" tab; setting `book` shows under the "Book Review" tab |
 
 ## Writing Article Content
 

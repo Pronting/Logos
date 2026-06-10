@@ -36,12 +36,13 @@ image: ""
 draft: false
 slugId: intro/publish
 pinTop: 2
+type: default
 ---
 ```
 
-| 名称 | 作用 | 
-| :--- | :--- | 
-| `title` | 文章标题 | 
+| 名称 | 作用 |
+| :--- | :--- |
+| `title` | 文章标题 |
 | `pubDate` | 发布时间，格式为 `YYYY-MM-DD` |
 | `description` | 文章描述 |
 | `category` | 分类，不填时，默认为`未分类` |
@@ -49,6 +50,7 @@ pinTop: 2
 | `draft` | 是否草稿，当文章处于草稿状态，发布的时候将不会显示在博客主页 |
 | `slugId` | 文章的ID，用于生成路由，每篇文章必须是唯一的，建议使用文章路径，比如`intro/publish` |
 | `pinTop` | 是否置顶，不设置或数字小于1表示不置顶，数字越大越排版越靠前 |
+| `type` | 文章类型，可选值：`default`（默认，技术/一般文章）或 `book`（书评文章）。不填默认为 `default`，会显示在「技术文章」Tab 下；填 `book` 则会显示在「书评」Tab 下 |
 
 ## 编写文章内容
 
