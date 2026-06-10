@@ -2,7 +2,7 @@
 title: "置身事内：中国政府与经济发展"
 author: "兰小欢"
 cover: "https://pront-base-1318237185.cos.ap-guangzhou.myqcloud.com/20260610210412355.png"
-tags: ["政治经济学"]
+tags: ["经济学"]
 rating: "recommended"
 summary: "一部理解中国经济发展与政府角色的入门佳作，以地方政府投融资为主线，深入浅出地讲解了中国政府在经济发展中所扮演的角色。"
 readDate: 2025-12-15

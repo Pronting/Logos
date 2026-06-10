@@ -11,16 +11,18 @@
 </script>
 
 <button
-  class="block w-full text-left rounded-xl border border-[var(--button-border-color)] bg-[var(--bg-color)] overflow-hidden shadow hover:shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-[var(--link-color)] focus:outline-none focus:ring-2 focus:ring-[var(--link-color)] group"
+  class="block w-full text-left border border-[var(--button-border-color)] bg-[var(--bg-color)] overflow-hidden shadow hover:shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-[var(--link-color)] focus:outline-none focus:ring-2 focus:ring-[var(--link-color)] group"
   onclick={() => onselect(book)}
   data-aos="fade-up"
   title={book.title + " — " + book.author}
 >
-  <div class="aspect-[3/4] bg-[var(--button-hover-color)] flex items-center justify-center overflow-hidden">
+  <div class="bg-[var(--button-hover-color)] flex items-center justify-center">
     {#if book.cover}
-      <img src={book.cover} alt={book.title} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+      <img src={book.cover} alt={book.title} class="w-full h-auto object-contain group-hover:scale-[1.02] transition-transform duration-500" loading="lazy" />
     {:else}
-      <Icon icon="fa6-solid:book" class="w-12 h-12 text-[var(--text-color-70)]" />
+      <div class="aspect-[3/4] flex items-center justify-center">
+        <Icon icon="fa6-solid:book" class="w-12 h-12 text-[var(--text-color-70)]" />
+      </div>
     {/if}
   </div>
 
