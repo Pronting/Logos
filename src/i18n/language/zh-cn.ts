@@ -4,6 +4,8 @@ const translation: Translation = {
     header: {
         home: "首页",
         archive: "归档",
+        tech: "技术文章",
+        bookReview: "书评",
         about: "关于",
         friends: "友链",
     },
@@ -11,12 +13,16 @@ const translation: Translation = {
         title: {
             home: "欢迎来到Momo的博客",
             archive: "文章归档",
+            tech: "技术文章",
+            bookReview: "书评",
             about: "关于",
             friends: "友链",
         },
         subTitle: {
             home: "生活多彩！",
             archive: "共 {count} 篇文章",
+            tech: "记录技术学习与思考",
+            bookReview: "读万卷书，行万里路",
             about: "一个极简的Blog模板",
             friends: "有趣的灵魂",
         }

@@ -25,3 +25,13 @@ pnpm-debug.log*
 
 # vscode setting folder
 .vscode/
+
+
+# ai
+.claude
+.spec-workflow
+
+# blog
+
+src/content/blog/internet
+src/content/blog/book
