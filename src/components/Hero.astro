@@ -3,47 +3,37 @@ import "@styles/global.css"
 import { heroConfig } from "@/config/hero"
 
 const { greeting, name, motto, tags } = heroConfig;
-const titleChars = [...greeting, ...name];
 ---
 
 <div
     class="hero-section text-center pt-16 pb-8 max-w-[var(--page-width)] mx-auto md:mt-0 mt-24 px-4"
     data-aos="fade-up"
+    data-aos-duration="800"
 >
-    <!-- 大字主标题：逐字淡入 -->
+    <!-- 大字主标题 -->
     <h1
-        class="hero-title text-[var(--text-color)] font-extrabold leading-tight tracking-tight mb-4"
+        class="text-[var(--text-color)] font-extrabold leading-tight tracking-tight mb-4"
         style="font-size: clamp(2.5rem, 6vw, 5rem);"
     >
-        {titleChars.map((char, i) => (
-            <span
-                class="hero-char"
-                style={`animation: heroFadeIn 0.5s ease-out both; animation-delay: ${i * 60}ms;`}
-            >
-                {char === " " ? " " : char}
-            </span>
-        ))}
+        {greeting} {name}
     </h1>
 
-    <!-- 座右铭：CSS 打字机效果 -->
-    <p
-        class="hero-motto text-[var(--text-color-70)] mb-6"
-        style={`font-size: clamp(1rem, 2.5vw, 1.5rem);`}
-    >
+    <!-- 座右铭：JS 打字机 -->
+    <p class="mb-6" style="font-size: clamp(1rem, 2.5vw, 1.5rem);">
         <span
-            class="hero-motto-text inline-block"
-            style={`overflow: hidden; white-space: nowrap;
-                   border-right: 2px solid var(--link-color);
-                   width: 0;
-                   animation: heroTypewriter 1.5s steps(${motto.length}, end) 1.2s forwards,
-                              heroBlinkCaret 0.6s step-end 1.2s infinite;`}
-        >
-            {motto}
-        </span>
+            id="hero-motto"
+            class="text-[var(--text-color-70)]"
+            data-motto={motto}
+        ></span>
+        <span
+            id="hero-cursor"
+            class="inline-block w-[2px] h-[1em] bg-[var(--link-color)] align-text-bottom ml-0.5"
+            style="animation: blink 0.6s step-end infinite;"
+        ></span>
     </p>
 
     <!-- 标签行 -->
-    <div class="hero-tags flex flex-wrap justify-center gap-3" data-aos="fade-up" data-aos-delay="400">
+    <div class="flex flex-wrap justify-center gap-3" data-aos="fade-up" data-aos-delay="400">
         {tags.map((tag) => (
             <span
                 class="inline-block px-4 py-1.5 rounded-full text-sm font-medium
@@ -58,61 +48,41 @@ const titleChars = [...greeting, ...name];
     </div>
 </div>
 
-<!-- is:global ensures keyframe names are NOT scoped, so inline style="animation: heroFadeIn" matches -->
-<style is:global>
-    .hero-char {
-        display: inline-block;
-        opacity: 0;
-    }
-
-    @keyframes heroFadeIn {
-        0% {
-            opacity: 0;
-            transform: translateY(0.8em);
-        }
-        100% {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    @keyframes heroTypewriter {
-        from {
-            width: 0;
-        }
-        to {
-            width: 100%;
-        }
-    }
-
-    @keyframes heroBlinkCaret {
-        from,
-        to {
-            border-color: transparent;
-        }
-        50% {
-            border-color: var(--link-color);
-        }
+<style>
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
     }
 </style>
 
 <script>
-    function resetHeroAnimation() {
-        const chars = document.querySelectorAll<HTMLElement>('.hero-char');
-        const motto = document.querySelector<HTMLElement>('.hero-motto-text');
+    function runTypewriter() {
+        const el = document.getElementById('hero-motto');
+        const cursor = document.getElementById('hero-cursor');
+        if (!el || !cursor) return;
 
-        chars.forEach((el) => {
-            el.style.animation = 'none';
-            void el.offsetHeight;
-            el.style.animation = '';
-        });
+        const text = el.dataset.motto || '';
+        if (el.textContent && el.textContent.length >= text.length) return; // already typed
 
-        if (motto) {
-            motto.style.animation = 'none';
-            void motto.offsetHeight;
-            motto.style.animation = '';
+        el.textContent = '';
+        cursor.style.display = 'inline-block';
+
+        let i = 0;
+        const speed = 100; // ms per character
+
+        function typeNext() {
+            if (i < text.length) {
+                el.textContent += text[i];
+                i++;
+                setTimeout(typeNext, speed);
+            } else {
+                // Keep cursor blinking after typing completes
+            }
         }
+
+        // Small delay so the AOS fade-up settles first
+        setTimeout(typeNext, 600);
     }
 
-    document.addEventListener('astro:page-load', resetHeroAnimation);
+    document.addEventListener('astro:page-load', runTypewriter);
 </script>
