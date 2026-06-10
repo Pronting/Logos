@@ -1,4 +1,8 @@
-# Momo
+# Logos
+
+---
+
+用 [Momo](https://github.com/Motues/Momo) 进行自定义开发, 当然，原仓库也是基于  [astro](https://github.com/withastro/astro) 进行开发的
 
 <div align="center">
     <img src="./doc/images/dark-light.jpg">
