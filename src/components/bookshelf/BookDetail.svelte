@@ -36,6 +36,8 @@
     onclose,
   }: Props = $props();
 
+  let showLightbox = $state(false);
+
   const ratingLabelMap: Record<BookRating, string> = {
     recommended: ratingRecommended,
     neutral: ratingNeutral,
@@ -53,9 +55,21 @@
     onclose();
   }
 
+  function openLightbox() {
+    showLightbox = true;
+  }
+
+  function closeLightbox() {
+    showLightbox = false;
+  }
+
   function onKeydown(e: KeyboardEvent) {
     if (e.key === "Escape") {
-      closeModal();
+      if (showLightbox) {
+        closeLightbox();
+      } else {
+        closeModal();
+      }
     }
   }
 
@@ -100,13 +114,18 @@
 
       <div class="p-6 md:p-8 space-y-5">
         <div class="flex flex-col sm:flex-row gap-5">
-          <div class="w-28 h-40 shrink-0 rounded-lg overflow-hidden border border-[var(--button-border-color)] bg-[var(--button-hover-color)] flex items-center justify-center">
+          <button
+            type="button"
+            class="w-28 h-40 shrink-0 rounded-lg overflow-hidden border border-[var(--button-border-color)] bg-[var(--button-hover-color)] flex items-center justify-center cursor-zoom-in hover:ring-2 hover:ring-[var(--link-color)] transition-all"
+            onclick={openLightbox}
+            aria-label="放大图片"
+          >
             {#if book.cover}
               <img src={book.cover} alt={book.title} class="w-full h-full object-cover" />
             {:else}
               <Icon icon="fa6-solid:book" class="w-8 h-8 text-[var(--text-color-70)]" />
             {/if}
-          </div>
+          </button>
 
           <div class="flex-1 min-w-0 space-y-2.5">
             <h2 class="text-xl font-bold text-[var(--text-color)] leading-snug pr-8">{book.title}</h2>
@@ -185,4 +204,28 @@
       </div>
     </div>
   </div>
+
+  <!-- Lightbox 放大图 -->
+  {#if showLightbox && book.cover}
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div
+      class="fixed inset-0 z-[300] flex items-center justify-center p-8 bg-black/80 backdrop-blur-md cursor-zoom-out"
+      onclick={closeLightbox}
+      role="dialog"
+      aria-modal="true"
+    >
+      <img
+        src={book.cover}
+        alt={book.title}
+        class="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+      />
+      <button
+        class="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+        onclick={closeLightbox}
+        aria-label="关闭"
+      >
+        <Icon icon="fa6-solid:xmark" class="w-5 h-5" />
+      </button>
+    </div>
+  {/if}
 {/if}
