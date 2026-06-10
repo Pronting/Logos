@@ -12,7 +12,6 @@ const blogCollection = defineCollection({
         slugId: z.string(),
         tags: z.array(z.string()).optional(),
         pinTop: z.number().optional().default(0),
-        type: z.enum(['default', 'book']).optional().default('default'),
     }),
 })
 
@@ -37,8 +36,24 @@ const booksCollection = defineCollection({
     }),
 })
 
+const bookReviewCollection = defineCollection({
+    loader: glob({ pattern: '**/[^_]*.md', base: "./src/content/book-review" }),
+    schema: z.object({
+        title: z.string(),
+        pubDate: z.date(),
+        draft: z.boolean().optional().default(false),
+        description: z.string().optional().default(''),
+        image: z.string().optional().default(''),
+        tags: z.array(z.string()).optional(),
+        pinTop: z.number().optional().default(0),
+        bookSlug: z.string(),
+        rating: z.enum(['recommended', 'neutral', 'not-recommended']).optional(),
+    }),
+})
+
 export const collections = {
     blog: blogCollection,
     spec: specCollection,
     books: booksCollection,
+    bookReview: bookReviewCollection,
 }

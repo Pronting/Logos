@@ -4,7 +4,7 @@ import Cover from '@components/Cover.astro';
 import FabMenu from '@components/control/FabMenu.astro';
 import Bookshelf from '@components/bookshelf/Bookshelf.svelte';
 
-import { getBooks, toBookMeta } from '@utils/book-utils';
+import { getBooks, toBookMeta, buildBookReviewMap } from '@utils/book-utils';
 import { siteConfig } from '@/config';
 import { i18n } from "astro:config/client";
 
@@ -20,7 +20,8 @@ const currentLang = Astro.currentLocale || i18n!.defaultLocale;
 const t = i18nit(currentLang);
 
 const bookEntries = await getBooks(currentLang);
-const books = bookEntries.map(toBookMeta);
+const reviewMap = await buildBookReviewMap(currentLang);
+const books = bookEntries.map((entry) => toBookMeta(entry, reviewMap.get(entry.id)));
 const pageTitle = `${t("header.bookshelf")} - ${siteConfig.title}`;
 ---
 

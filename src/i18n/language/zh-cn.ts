@@ -144,6 +144,11 @@ const translation: Translation = {
         summary: "简介",
         myReview: "我的书评",
         noResults: "未找到相关书籍",
+        noReview: "暂无书评",
+        readReview: "阅读书评",
+        statsRead: "本已读",
+        statsRecommended: "本推荐",
+        statsDomains: "个领域",
     },
     themeInfo: {
         light: "切换到 浅色 模式",

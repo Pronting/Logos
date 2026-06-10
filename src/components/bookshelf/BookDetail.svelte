@@ -14,6 +14,8 @@
     ratingRecommended: string;
     ratingNeutral: string;
     ratingNotRecommended: string;
+    noReviewLabel: string;
+    readReviewLabel: string;
     onclose: () => void;
   }
 
@@ -29,6 +31,8 @@
     ratingRecommended,
     ratingNeutral,
     ratingNotRecommended,
+    noReviewLabel,
+    readReviewLabel,
     onclose,
   }: Props = $props();
 
@@ -59,7 +63,6 @@
     if (e.target === e.currentTarget) closeModal();
   }
 
-  // Lock scroll + register Escape listener when modal opens
   $effect(() => {
     if (book) {
       document.body.style.overflow = "hidden";
@@ -80,14 +83,12 @@
     aria-modal="true"
     aria-label={book.title}
   >
-    <!-- Backdrop -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
       class="absolute inset-0 bg-black/60 backdrop-blur-sm"
       onclick={onBackdropClick}
     ></div>
 
-    <!-- Modal Card -->
     <div class="relative bg-[var(--bg-color)] rounded-2xl border border-[var(--button-border-color)] shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto mx-4">
       <button
         class="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-[var(--button-hover-color)] hover:bg-[var(--button-border-color)] transition-colors"
@@ -157,9 +158,29 @@
 
         <div>
           <h3 class="text-sm font-semibold text-[var(--text-color)] mb-2">{myReviewLabel}</h3>
-          <p class="text-sm text-[var(--text-color-70)] leading-relaxed italic">
-            书评内容将在后续版本中支持 Markdown 富文本渲染。
-          </p>
+          {#if book.reviewLinks && book.reviewLinks.length > 0}
+            <ul class="space-y-2">
+              {#each book.reviewLinks as link}
+                <li>
+                  <a
+                    href={link.url}
+                    class="text-sm text-[var(--link-color)] hover:underline flex items-center gap-2 group"
+                  >
+                    <Icon icon="fa6-solid:file-lines" class="w-3.5 h-3.5 text-[var(--text-color-70)] group-hover:text-[var(--link-color)] transition-colors" />
+                    <span>{link.title}</span>
+                    <span class="text-xs text-[var(--text-color-70)]">
+                      {new Date(link.pubDate).toLocaleDateString("zh-CN")}
+                    </span>
+                    <Icon icon="fa6-solid:arrow-right" class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </a>
+                </li>
+              {/each}
+            </ul>
+          {:else}
+            <p class="text-sm text-[var(--text-color-70)] leading-relaxed italic">
+              {noReviewLabel}
+            </p>
+          {/if}
         </div>
       </div>
     </div>

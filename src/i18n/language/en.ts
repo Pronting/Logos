@@ -144,6 +144,11 @@ const translation: Translation = {
         summary: "Summary",
         myReview: "My Review",
         noResults: "No books found",
+        noReview: "No reviews yet",
+        readReview: "Read Review",
+        statsRead: "read",
+        statsRecommended: "recommended",
+        statsDomains: "domains",
     },
     themeInfo: {
         light: "Switch to Light Mode",

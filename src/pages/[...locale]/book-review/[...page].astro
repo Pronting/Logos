@@ -5,10 +5,9 @@ import PostPage from '@components/PostPage.astro';
 import Navi from '@components/control/Navi.astro';
 import FabMenu from '@components/control/FabMenu.astro';
 
-import { getBlogEntrySort } from '@utils/content-utils'
+import { getBookReviews } from '@utils/book-utils'
 import { siteConfig } from '@/config';
 import { i18n } from "astro:config/client";
-import type { CollectionEntry } from 'astro:content';
 import type { GetStaticPaths } from 'astro';
 import { getRelativeLocaleUrl } from '@utils/url-utils';
 
@@ -21,44 +20,19 @@ const currentLang = Astro.currentLocale || i18n!.defaultLocale;
 const t = i18nit(currentLang);
 
 export const getStaticPaths = (async ({ paginate }) => {
-
-    function createPinTopSort() {
-        return (a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) => {
-            const pinTopA = a.data.pinTop ?? 0;
-            const pinTopB = b.data.pinTop ?? 0;
-
-            if (pinTopA > 0 && pinTopB > 0) {
-                return pinTopB - pinTopA;
-            }
-
-            if (pinTopA > 0) return -1;
-            if (pinTopB > 0) return 1;
-
-            return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
-        };
-    }
-
     const paths = [];
     for (const locale of i18n.locales) {
         const localeCode = typeof locale === 'string' ? locale : locale.path;
         const localeParam = localeCode === i18n.defaultLocale ? undefined : localeCode;
-        const blogEntries = await getBlogEntrySort(
-            localeParam,
-            (entry) => entry.data.type === 'book',
-            createPinTopSort()
-        );
-        const paginatedPaths = paginate(blogEntries, {
+        const reviewEntries = await getBookReviews(localeParam);
+        const paginatedPaths = paginate(reviewEntries, {
             pageSize: siteConfig.pageSize,
             params: { locale: localeParam }
         });
-
         paths.push(...paginatedPaths);
     }
-
     return paths;
 }) satisfies GetStaticPaths
-
-
 
 const indexPage = getRelativeLocaleUrl(locale, '/');
 const pageTitle = `${t("header.bookReview")} - ${siteConfig.title}`;
@@ -66,7 +40,7 @@ const pageTitle = `${t("header.bookReview")} - ${siteConfig.title}`;
 
 <MainPageLayout title={pageTitle} lang={currentLang}>
     <Cover title={t("cover.title.bookReview")} subTitle={t("cover.subTitle.bookReview")} />
-    <PostPage page={page} />
+    <PostPage page={page} urlPrefix="/book-review/" />
     <Navi page={page} />
     <FabMenu showBackBottom={true} />
 </MainPageLayout>

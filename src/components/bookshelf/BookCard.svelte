@@ -8,18 +8,6 @@
   }
 
   let { book, onselect }: Props = $props();
-
-  const ratingLabel: Record<string, string> = {
-    recommended: "推荐",
-    neutral: "中庸",
-    "not-recommended": "不行",
-  };
-
-  const ratingColor: Record<string, string> = {
-    recommended: "bg-emerald-500/80",
-    neutral: "bg-amber-400/80",
-    "not-recommended": "bg-rose-400/80",
-  };
 </script>
 
 <button
@@ -35,21 +23,8 @@
     {/if}
   </div>
 
-  <div class="p-4 space-y-2">
+  <div class="p-4 space-y-1">
     <h3 class="font-semibold text-[var(--text-color)] line-clamp-2 leading-snug">{book.title}</h3>
-
     <p class="text-sm text-[var(--text-color-70)]">{book.author}</p>
-
-    <div class="flex flex-wrap gap-1.5 pt-1">
-      {#each book.tags as tag}
-        <span class="text-xs px-2 py-0.5 rounded-full bg-[var(--button-hover-color)] text-[var(--text-color-70)] border border-[var(--button-border-color)]">
-          {tag}
-        </span>
-      {/each}
-    </div>
-
-    <span class="inline-block text-xs px-2 py-0.5 rounded-full text-white {ratingColor[book.rating] ?? 'bg-gray-400'}">
-      {ratingLabel[book.rating] ?? book.rating}
-    </span>
   </div>
 </button>

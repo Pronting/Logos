@@ -142,6 +142,11 @@ export interface Translation {
         summary: string;
         myReview: string;
         noResults: string;
+        noReview: string;
+        readReview: string;
+        statsRead: string;
+        statsRecommended: string;
+        statsDomains: string;
     };
     themeInfo: {
         light: string;

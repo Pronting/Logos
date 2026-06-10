@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { BookMeta, BookRating, BookTag } from "@/types/book";
+  import type { BookMeta, BookRating } from "@/types/book";
   import BookCard from "./BookCard.svelte";
   import BookFilters from "./BookFilters.svelte";
   import BookDetail from "./BookDetail.svelte";
@@ -11,7 +11,7 @@
   let { books }: Props = $props();
 
   let q = $state("");
-  let tag = $state<BookTag | "all">("all");
+  let tag = $state<string | "all">("all");
   let rating = $state<BookRating | "all">("all");
   let selectedBook = $state<BookMeta | null>(null);
 
@@ -21,11 +21,40 @@
         const haystack = `${book.title} ${book.author}`.toLowerCase();
         if (!haystack.includes(q.trim().toLowerCase())) return false;
       }
-      if (tag !== "all" && !book.tags.includes(tag as BookTag)) return false;
+      if (tag !== "all" && !book.tags.includes(tag)) return false;
       if (rating !== "all" && book.rating !== (rating as BookRating)) return false;
       return true;
     }),
   );
+
+  // 按领域分组：同一个 tag 下的书籍放在一块
+  const grouped = $derived(() => {
+    const tagMap = new Map<string, BookMeta[]>();
+    const untagged: BookMeta[] = [];
+
+    for (const book of filtered) {
+      if (book.tags.length === 0) {
+        untagged.push(book);
+        continue;
+      }
+      for (const t of book.tags) {
+        const list = tagMap.get(t) ?? [];
+        list.push(book);
+        tagMap.set(t, list);
+      }
+    }
+
+    // 按组内书籍数量降序
+    const groups = [...tagMap.entries()]
+      .sort((a, b) => b[1].length - a[1].length)
+      .map(([domain, books]) => ({ domain, books }));
+
+    if (untagged.length > 0) {
+      groups.push({ domain: "未分类", books: untagged });
+    }
+
+    return groups;
+  });
 
   const i18n = {
     searchPlaceholder: "搜索书名或作者...",
@@ -44,6 +73,11 @@
     summary: "简介",
     myReview: "我的书评",
     noResults: "未找到相关书籍",
+    noReview: "暂无书评",
+    readReview: "阅读书评",
+    statsRead: "本已读",
+    statsRecommended: "本推荐",
+    statsDomains: "个领域",
   };
 
   function handleSelect(book: BookMeta) {
@@ -57,6 +91,7 @@
 
 <div class="space-y-6">
   <BookFilters
+    books={books}
     bind:q
     bind:tag
     bind:rating
@@ -68,16 +103,28 @@
     ratingNotRecommended={i18n.ratingNotRecommended}
     ratingAll={i18n.ratingAll}
     tagAll={i18n.tagAll}
+    statsRead={i18n.statsRead}
+    statsRecommended={i18n.statsRecommended}
+    statsDomains={i18n.statsDomains}
   />
 
   {#if filtered.length === 0}
     <p class="text-center text-[var(--text-color-70)] py-16">{i18n.noResults}</p>
   {:else}
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-5">
-      {#each filtered as book (book.id)}
-        <BookCard book={book} onselect={handleSelect} />
-      {/each}
-    </div>
+    {#each grouped() as group (group.domain)}
+      <div class="space-y-4">
+        <h2 class="text-lg font-bold text-[var(--text-color)] flex items-center gap-2">
+          <span class="w-1 h-5 bg-[var(--link-color)] rounded-full"></span>
+          {group.domain}
+          <span class="text-sm font-normal text-[var(--text-color-70)]">({group.books.length})</span>
+        </h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-5">
+          {#each group.books as book (book.id)}
+            <BookCard book={book} onselect={handleSelect} />
+          {/each}
+        </div>
+      </div>
+    {/each}
   {/if}
 
   {#if selectedBook}
@@ -94,6 +141,8 @@
       ratingRecommended={i18n.ratingRecommended}
       ratingNeutral={i18n.ratingNeutral}
       ratingNotRecommended={i18n.ratingNotRecommended}
+      noReviewLabel={i18n.noReview}
+      readReviewLabel={i18n.readReview}
     />
   {/if}
 </div>
