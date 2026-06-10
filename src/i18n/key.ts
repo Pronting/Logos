@@ -123,5 +123,12 @@ export interface Translation {
         light: string;
         dark: string;
         system: string;
+    },
+    profileCard: {
+        title: string;
+        contact: string;
+        copy: string;
+        copySuccess: string;
+        copyFailed: string;
     }
 }

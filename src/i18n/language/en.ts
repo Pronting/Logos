@@ -125,6 +125,13 @@ const translation: Translation = {
         light: "Switch to Light Mode",
         dark: "Switch to Dark Mode",
         system: "Switch to System Mode"
+    },
+    profileCard: {
+        title: "About Me",
+        contact: "Contact",
+        copy: "Copy",
+        copySuccess: "Copied to clipboard",
+        copyFailed: "Copy failed, please copy manually",
     }
 }
 

@@ -125,6 +125,13 @@ const translation: Translation = {
         light: "切换到 浅色 模式",
         dark: "切换到 深色 模式",
         system: "切换到 跟随系统 模式"
+    },
+    profileCard: {
+        title: "关于我",
+        contact: "联系方式",
+        copy: "复制",
+        copySuccess: "已复制到剪贴板",
+        copyFailed: "复制失败，请手动复制",
     }
 }
 
