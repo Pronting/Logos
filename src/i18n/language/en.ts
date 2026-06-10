@@ -161,6 +161,13 @@ const translation: Translation = {
         copy: "Copy",
         copySuccess: "Copied to clipboard",
         copyFailed: "Copy failed, please copy manually",
+    },
+    column: {
+        title: "Columns",
+        articleCount: "{count} articles",
+        noColumns: "No columns yet",
+        backToList: "Back to Columns",
+        series: "Series",
     }
 }
 

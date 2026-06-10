@@ -51,6 +51,16 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
     <script defer src="https://umami.motues.top/script.js" data-hash is:inline></script>
     <title>{pageTitle}</title>
     <ClientRouter />
+    {/* Service Worker 注册 - 图片缓存加速 */}
+    <script is:inline>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {
+                    // SW 注册失败静默处理，不影响页面正常运行
+                });
+            });
+        }
+    </script>
     <script is:inline>
         document.addEventListener('astro:before-swap', (e) => {
             const theme = document.documentElement.getAttribute('data-theme');

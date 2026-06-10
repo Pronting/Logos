@@ -21,17 +21,15 @@ interface Props {
     url: string;
     fallback: boolean;
     urlPrefix?: string;
-    bookTitle?: string;
 }
 
-const { entry, title, description, image, pubDate, url, fallback, urlPrefix = "/blog/", bookTitle } = Astro.props;
+const { entry, title, description, image, pubDate, url, fallback, urlPrefix = "/blog/" } = Astro.props;
 
 const currentLang = Astro.currentLocale || i18n!.defaultLocale;
 const t = i18nit(currentLang);
 
 const pageUrl = getRelativeLocaleUrl(currentLang, urlPrefix + url);
 const { remarkPluginFrontmatter } = await render(entry);
-const isBookReview = urlPrefix === "/book-review/";
 ---
 
 <div data-aos="fade-up"  class="block min-w-0 w-full max-w-[var(--page-width)] mx-auto my-6  rounded-xl shadow border border-[var(--button-border-color)] overflow-hidden">
@@ -74,10 +72,8 @@ const isBookReview = urlPrefix === "/book-review/";
                 <span class="py-1 px-1">{remarkPluginFrontmatter.minutes || 0} {t("pagecard.minutes")}</span>
             </p>
             <p class="flex items-center whitespace-nowrap mr-2">
-                <Icon name="fa6-solid:book" class="mr-1"></Icon>
-                {isBookReview && bookTitle ? (
-                    <a href={getRelativeLocaleUrl(currentLang, "/bookshelf/")} class="tag-pill hover:text-[var(--link-color)]">{bookTitle}</a>
-                ) : entry.data.tags && entry.data.tags.length > 0 ? (
+                <Icon name="fa6-solid:hashtag" class="mr-1"></Icon>
+                {entry.data.tags && entry.data.tags.length > 0 ? (
                     entry.data.tags.map((tag: string, i: number) => (
                         <>
                             {i > 0 && <span class="mx-0.5">·</span>}

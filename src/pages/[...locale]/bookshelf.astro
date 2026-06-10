@@ -7,6 +7,7 @@ import Bookshelf from '@components/bookshelf/Bookshelf.svelte';
 import { getBooks, toBookMeta, buildBookReviewMap } from '@utils/book-utils';
 import { siteConfig } from '@/config';
 import { i18n } from "astro:config/client";
+
 import i18nit from '@i18n/translation'
 
 export async function getStaticPaths() {
@@ -20,10 +21,7 @@ const t = i18nit(currentLang);
 
 const bookEntries = await getBooks(currentLang);
 const reviewMap = await buildBookReviewMap(currentLang);
-const books = bookEntries.map((entry) => {
-    const meta = toBookMeta(entry, reviewMap.get(entry.id.replace(/\/[^\/]+$/, "")));
-    return meta;
-});
+const books = bookEntries.map((entry) => toBookMeta(entry, reviewMap.get(entry.id)));
 const pageTitle = `${t("header.bookshelf")} - ${siteConfig.title}`;
 ---
 

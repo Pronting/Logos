@@ -159,5 +159,12 @@ export interface Translation {
         copy: string;
         copySuccess: string;
         copyFailed: string;
+    },
+    column: {
+        title: string;
+        articleCount: string;
+        noColumns: string;
+        backToList: string;
+        series: string;
     }
 }
