@@ -1,9 +1,26 @@
 ---
-import { blogCoverUrl} from '@utils/url-utils'
+import { blogCoverUrl, getRelativeLocaleUrl } from '@utils/url-utils'
 import PostCard from '@components/PostCard.astro';
 import type { CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+import { i18n } from "astro:config/client";
 
 const { page, urlPrefix = "/blog/" } = Astro.props;
+
+// 构建 bookSlug → bookTitle 映射（仅书评页需要）
+let bookTitleMap: Record<string, string> = {};
+if (urlPrefix === "/book-review/") {
+    const currentLang = Astro.currentLocale || i18n!.defaultLocale;
+    const allBooks = await getCollection("books", ({ data }) => (
+        import.meta.env.PROD ? data.draft !== true : true
+    ));
+    for (const book of allBooks) {
+        const slug = book.id.replace(/\/[^\/]+$/, "");
+        if (!bookTitleMap[slug]) {
+            bookTitleMap[slug] = book.data.title;
+        }
+    }
+}
 
 ---
 {page.data.map((entry: CollectionEntry<"blog"> | CollectionEntry<"bookReview">) => (
@@ -15,6 +32,7 @@ const { page, urlPrefix = "/blog/" } = Astro.props;
             pubDate={entry.data.pubDate}
             url={entry.id}
             fallback={entry.isFallback ?? false}
-            urlPrefix={urlPrefix}>
+            urlPrefix={urlPrefix}
+            bookTitle={"bookSlug" in entry.data ? bookTitleMap[(entry.data as any).bookSlug] : undefined}>
         </PostCard>
 ))}
