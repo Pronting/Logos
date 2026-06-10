@@ -2,7 +2,7 @@
 title: 更新指南和版本记录
 pubDate: 2026-01-01
 description: 网站配置
-category: 指南
+tags: [指南]
 image: "./images/banner.png"
 draft: false
 slugId: momo/intro/release

@@ -2,7 +2,7 @@
 title: Article Publishing Guide
 pubDate: 2025-09-29
 description: Website Configuration
-category: Instruction
+tags: [Instruction]
 image: ""
 draft: false
 slugId: momo/intro/publish
@@ -30,7 +30,7 @@ Each article requires a metadata section (frontmatter) using YAML format, enclos
 title: Article Title
 pubDate: 2025-01-01
 description: Brief article description
-category: Category
+tags: [Category]
 image: ""
 draft: false
 slugId: intro/publish
@@ -44,7 +44,7 @@ type: default
 | `title` | Article title |
 | `pubDate` | Publication date, formatted as `YYYY-MM-DD` |
 | `description` | Article description |
-| `category` | Article category, if undefined, the article will be categorized as `Uncategorized` |
+| `tags` | Article tags, supports multiple tags using YAML array format, e.g. `[Guide, Beginner]`. If undefined, defaults to `Uncategorized` |
 | `image` | Cover image, using relative paths relative to the current file, e.g., `./images/cover.png` |
 | `draft` | Draft status; articles in draft mode won't appear on the blog homepage when published |
 | `slugId` | Article ID, used for generating routes. Each article must be unique. It is recommended to use article paths, such as `intro/publish`. |

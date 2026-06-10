@@ -2,7 +2,7 @@
 title: Test Card
 pubDate: 2026-01-05
 description: Article functionality testing
-category: Test
+tags: [Test]
 image: ""
 draft: true
 slugId: momo/test/card
