@@ -1,0 +1,78 @@
+---
+import '@styles/global.css'
+import { siteConfig } from '@/config'
+import MainPageLayout from '@layouts/MainPageLayout.astro'
+import Markdown from '@components/misc/Markdown.astro'
+import FabMenu from '@components/control/FabMenu.astro'
+import Comments from '@components/comment/Comments.svelte'
+
+import { getCollection, render } from 'astro:content'
+import { i18n } from "astro:config/client";
+import i18nit from '@i18n/translation'
+import { Icon } from "astro-icon/components";
+import { getRelativeLocaleUrl } from '@/utils/url-utils'
+import { formatFullDate } from '@/utils/time'
+import { getBookReviews } from '@utils/book-utils'
+
+const currentLang = Astro.currentLocale || i18n!.defaultLocale;
+const t = i18nit(currentLang);
+
+export async function getStaticPaths() {
+    const locales = i18n?.locales || [i18n?.defaultLocale];
+    const paths = [];
+
+    for (const locale of locales) {
+        const localeCode = typeof locale === 'string' ? locale : locale.path;
+        const localeParam = localeCode === i18n.defaultLocale ? undefined : localeCode;
+        const reviews = await getBookReviews(localeParam);
+
+        for (const entry of reviews) {
+            paths.push({
+                params: {
+                    locale: localeParam,
+                    id: entry.id
+                },
+                props: { entry }
+            });
+        }
+    }
+
+    return paths;
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await render(entry);
+const pageTitle = entry.data.title + ' - ' + siteConfig.title;
+---
+
+<MainPageLayout title={pageTitle} lang={currentLang} description={entry.data.description}>
+    <div class="mx-auto w-full max-w-[var(--page-width)] py-8 md:mt-0 mt-18">
+        <div class="mb-18 text-center">
+            <h1 class="font-bold text-3xl mb-2 pt-10 text-[var(--text-color)]">{ entry.data.title }</h1>
+            <p class="flex flex-wrap items-center justify-center font-bold text-[var(--text-color-70)] mt-6">
+                <Icon name="fa6-solid:calendar-days" class="mr-2"></Icon>
+                <span>{ formatFullDate(entry.data.pubDate, currentLang) }</span>
+            </p>
+            <div class="flex flex-wrap items-center justify-center text-sm text-[var(--text-color-70)] mt-2 gap-2">
+                {entry.data.tags && entry.data.tags.length > 0 && (
+                    <p class="flex items-center whitespace-nowrap mr-2">
+                        <Icon name="fa6-solid:hashtag" class="mr-1"></Icon>
+                        {entry.data.tags.map((tag: string, i: number) => (
+                            <>
+                                {i > 0 && <span class="mx-0.5">·</span>}
+                                <span>{tag}</span>
+                            </>
+                        ))}
+                    </p>
+                )}
+            </div>
+        </div>
+        <Markdown class="mb-6 mt-10 markdown-content onload-animation">
+            <Content />
+        </Markdown>
+        {siteConfig.comments.enable && siteConfig.comments.platform === "default" && (
+            <Comments postSlug={entry.data.bookSlug} language={currentLang} postTitle={entry.data.title} client:visible/>
+        )}
+    </div>
+    <FabMenu showBackBottom={!siteConfig.comments.enable}/>
+</MainPageLayout>

@@ -118,7 +118,7 @@
           {group.domain}
           <span class="text-sm font-normal text-[var(--text-color-70)]">({group.books.length})</span>
         </h2>
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-5">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-5">
           {#each group.books as book (book.id)}
             <BookCard book={book} onselect={handleSelect} />
           {/each}

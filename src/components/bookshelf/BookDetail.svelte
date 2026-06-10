@@ -164,7 +164,7 @@
                 <li>
                   <a
                     href={link.url}
-                    class="text-sm text-[var(--link-color)] hover:underline flex items-center gap-2 group"
+                    class="text-sm text-[var(--link-color)] hover:underline hover:pl-1 flex items-center gap-2 group transition-all duration-200"
                   >
                     <Icon icon="fa6-solid:file-lines" class="w-3.5 h-3.5 text-[var(--text-color-70)] group-hover:text-[var(--link-color)] transition-colors" />
                     <span>{link.title}</span>
