@@ -47,7 +47,7 @@ const { entry, bookInfoMap } = Astro.props;
 const { Content, headings } = await render(entry);
 const { remarkPluginFrontmatter } = await render(entry);
 const pageTitle = entry.data.title + ' - ' + siteConfig.title;
-const image = contentCoverUrl(entry.data.image ?? '', entry.id, 'book-review');
+const image = contentCoverUrl((entry.data.cover || entry.data.image) ?? '', entry.id, 'book-review');
 
 const relatedBook = entry.data.bookSlug ? bookInfoMap.get(entry.data.bookSlug) : null;
 const bookshelfUrl = entry.data.bookSlug

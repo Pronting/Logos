@@ -12,8 +12,8 @@ const { page, urlPrefix = "/blog/" } = Astro.props;
             title={entry.data.title}
             description={entry.data.description}
             image={entry.collection === 'bookReview'
-                ? contentCoverUrl(entry.data.image, entry.id, 'book-review')
-                : blogCoverUrl(entry.data.image, entry.id)}
+                ? contentCoverUrl(entry.data.cover || entry.data.image, entry.id, 'book-review')
+                : blogCoverUrl(entry.data.cover || entry.data.image, entry.id)}
             pubDate={entry.data.pubDate}
             url={entry.id}
             fallback={entry.isFallback ?? false}

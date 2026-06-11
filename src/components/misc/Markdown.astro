@@ -327,12 +327,6 @@ const className = Astro.props.class
           const img = figure.querySelector('img');
           if (!img) return;
 
-          // 检查 img 是否是 figure 的直接子节点
-          if (!figure.contains(img) || img.parentElement !== figure) {
-            // console.warn('Image is not a direct child of figure, skipping:', img);
-            return;
-          }
-
           // 创建 a 标签
           const a = document.createElement('a');
           a.href = img.src;

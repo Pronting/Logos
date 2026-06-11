@@ -3,8 +3,9 @@ import MainPageLayout from '@layouts/MainPageLayout.astro'
 import Markdown from '@components/misc/Markdown.astro'
 import Cover from '@components/Cover.astro'
 import FabMenu from '@components/control/FabMenu.astro'
+import ContributionHeatmap from '@components/ContributionHeatmap.svelte'
 
-import { getSpec } from '@utils/content-utils'
+import { getSpec, getContributionData } from '@utils/content-utils'
 
 import { siteConfig } from '@/config'
 import i18nit from '@i18n/translation'
@@ -24,6 +25,7 @@ if (!aboutPost) {
     throw new Error('No about post found');
 }
 const { Content } = await render(aboutPost);
+const contributions = await getContributionData(currentLang);
 
 const pageTitle = t("header.about") + " - " + siteConfig.title;
 ---
@@ -33,6 +35,7 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
         <Markdown class="mb-6 markdown-content onload-animation">
             <Content />
         </Markdown>
+        <ContributionHeatmap dates={contributions} client:load />
     </div>
     <FabMenu showBackBottom={true} />
 </MainPageLayout>

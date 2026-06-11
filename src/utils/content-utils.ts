@@ -162,3 +162,37 @@ export async function getArticles(
 
   return selectedEntries.sort(sort || defaultSort);
 }
+export interface ContributionDay {
+  date: string;
+  count: number;
+}
+
+/**
+ * 汇总所有内容类型 pubDate 按日计数，用于热力图。
+ */
+export async function getContributionData(lang: string): Promise<ContributionDay[]> {
+  const { getBookReviews } = await import('@utils/book-utils');
+  const { getAllColumnArticles } = await import('@utils/column-utils');
+
+  const [blogEntries, bookReviews, colArticles, articles] = await Promise.all([
+    getBlogEntrySort(lang),
+    getBookReviews(lang),
+    getAllColumnArticles(lang).catch(() => [] as { data: { pubDate?: Date } }[]),
+    getArticles(lang),
+  ]);
+
+  const countMap = new Map<string, number>();
+  for (const entry of [...blogEntries, ...bookReviews, ...colArticles, ...articles]) {
+    const pubDate = (entry as { data: { pubDate?: Date } }).data.pubDate;
+    if (!pubDate) continue;
+    const key = pubDate instanceof Date
+      ? pubDate.toISOString().slice(0, 10)
+      : String(pubDate).slice(0, 10);
+    countMap.set(key, (countMap.get(key) || 0) + 1);
+  }
+
+  const result: ContributionDay[] = [];
+  for (const [date, count] of countMap) result.push({ date, count });
+  result.sort((a, b) => a.date.localeCompare(b.date));
+  return result;
+}

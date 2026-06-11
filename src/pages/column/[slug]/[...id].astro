@@ -44,7 +44,7 @@ const t = i18nit(currentLang);
 const { Content, headings } = await render(article);
 
 const pageTitle = `${article.data.title} - ${column.data.title} - ${siteConfig.title}`;
-const image = blogCoverUrl(article.data.image, article.id);
+const image = blogCoverUrl(article.data.cover || article.data.image, article.id);
 
 const { remarkPluginFrontmatter } = await render(article);
 ---

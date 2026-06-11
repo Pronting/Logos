@@ -45,7 +45,7 @@ if (isLocal) {
 <div 
   class:list={["image-wrapper", className]} 
   style={{ "--lqip": lqipGradient }}
-  data-lqip-enabled={enableLQIP}
+  data-lqip-enabled={enableLQIP && isLocal}
 >
     <div class="lqip-bg"></div>
     {
