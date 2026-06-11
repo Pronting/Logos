@@ -1,8 +1,8 @@
 FROM node:22-alpine AS builder
 WORKDIR /app
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@10 --activate
 COPY package.json pnpm-lock.yaml ./
-RUN node -e "const p=require('./package.json');p.pnpm={onlyBuiltDependencies:['esbuild','sharp']};require('fs').writeFileSync('./package.json',JSON.stringify(p,null,2))" && pnpm install
+RUN pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm build
 
