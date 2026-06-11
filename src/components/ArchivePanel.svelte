@@ -47,7 +47,7 @@
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
     .map(([tag, count]) => ({ tag, count }));
 
-  // 过滤逻辑：选中任一 tag 即保留（多 tag 取并集）
+  // 过滤逻辑：文章必须包含所有选中的 tag（AND 条件）
   $: filteredPosts = selectedTags.length > 0
     ? sortedPosts.filter(post => {
         const tags = getPostTags(post);
@@ -55,7 +55,7 @@
         if (tags.length === 0) {
           return selectedTags.includes(UNTAGGED);
         }
-        return tags.some(t => selectedTags.includes(t));
+        return selectedTags.every(t => tags.includes(t));
       })
     : sortedPosts;
 
@@ -171,12 +171,15 @@
                 <h2 class="text-2xl font-bold my-4 text-[var(--text-color)] flex items-center gap-3">
                     <span class="w-1 h-6 bg-[var(--link-color)] rounded-full"></span>
                     {year}
+                    <span class="year-count text-xs font-medium px-2 py-0.5 rounded-full bg-[var(--button-hover-color)] text-[var(--text-color-70)] border border-[var(--button-border-color)] transition-all duration-200 hover:bg-[var(--link-color)] hover:text-white hover:border-[var(--link-color)] cursor-default">
+                        {postsByYear[year].length}篇
+                    </span>
                 </h2>
                 <div class="space-y-2">
                     {#each postsByYear[year] as post (post.id)}
                         <div animate:flip={{ duration: 600 }} in:fade={{ duration: 150 }} out:fade={{ duration: 150 }} >
                             <a
-                                href={getRelativeLocaleUrl(currentLang, `/blog/${post.id}`)}
+                                href={getRelativeLocaleUrl(currentLang, `${post.urlPrefix || "/blog/"}${post.id}`)}
                                 class="flex items-center gap-4 active:bg-[var(--button-hover-color)] hover:bg-[var(--button-hover-color)] p-2 rounded transition-all duration-200 group"
                             >
                                 <span class="text-[var(--text-color-70)] min-w-[80px] md:min-w-[120px]">

@@ -4,6 +4,8 @@ import ArchivePanel from '@components/ArchivePanel.svelte'
 import FabMenu from '@components/control/FabMenu.astro'
 import { siteConfig } from '@/config'
 import { getBlogEntrySort } from '@utils/content-utils'
+import { getBookReviews } from '@utils/book-utils'
+import { getAllColumnArticles } from '@utils/column-utils'
 import i18nit from '@i18n/translation'
 import { i18n } from "astro:config/client";
 
@@ -20,13 +22,31 @@ export async function getStaticPaths() {
 // 获取所有博客文章并按发布日期降序排序
 const allBlogPosts = await getBlogEntrySort(currentLang);
 
+// 获取书评文章，标记 URL 前缀，合并进归档列表
+const bookReviews = (await getBookReviews(currentLang)).map(r => ({
+    ...r,
+    urlPrefix: "/book-review/"
+}));
+
+// 获取专栏文章，标记 URL 前缀（含专栏 slug），合并进归档列表
+const columnArticles = (await getAllColumnArticles(currentLang)).map(a => ({
+    ...a,
+    urlPrefix: `/column/${a.columnSlug}/`
+}));
+
+const allPosts = [
+    ...allBlogPosts.map(p => ({ ...p, urlPrefix: "/blog/" })),
+    ...bookReviews,
+    ...columnArticles,
+].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
 const pageTitle = t("header.archive") + " - " + siteConfig.title;
 ---
 
 <MainPageLayout title={pageTitle} lang={currentLang}>
     <ArchivePanel
         client:only="svelte"
-        sortedPosts={allBlogPosts}
+        sortedPosts={allPosts}
         currentLang={currentLang}
         defaultLocale={i18n!.defaultLocale}
     />

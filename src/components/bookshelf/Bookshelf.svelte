@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { BookMeta, BookRating } from "@/types/book";
+  import { untrack } from "svelte";
   import BookCard from "./BookCard.svelte";
   import BookFilters from "./BookFilters.svelte";
   import BookDetail from "./BookDetail.svelte";
@@ -71,7 +72,8 @@
     year: "年份",
     author: "作者",
     summary: "简介",
-    myReview: "我的书评",
+    reviewArticle: "书评文章",
+    briefComment: "简短评价",
     noResults: "未找到相关书籍",
     noReview: "暂无书评",
     readReview: "阅读书评",
@@ -86,7 +88,27 @@
 
   function handleCloseDetail() {
     selectedBook = null;
+    // 关闭弹窗时清除 URL 中的 ?book= 参数
+    const url = new URL(window.location.href);
+    if (url.searchParams.has("book")) {
+      url.searchParams.delete("book");
+      window.history.replaceState({}, "", url.toString());
+    }
   }
+
+  // 挂载时检测 ?book= 参数，自动打开对应书籍详情（仅执行一次）
+  $effect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const bookSlug = params.get("book");
+    if (bookSlug) {
+      untrack(() => {
+        const match = books.find((b) => b.slug === bookSlug);
+        if (match) {
+          selectedBook = match;
+        }
+      });
+    }
+  });
 </script>
 
 <div class="space-y-6">
@@ -137,7 +159,8 @@
       yearLabel={i18n.year}
       authorLabel={i18n.author}
       summaryLabel={i18n.summary}
-      myReviewLabel={i18n.myReview}
+      briefCommentLabel={i18n.briefComment}
+      reviewArticleLabel={i18n.reviewArticle}
       ratingRecommended={i18n.ratingRecommended}
       ratingNeutral={i18n.ratingNeutral}
       ratingNotRecommended={i18n.ratingNotRecommended}

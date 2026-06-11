@@ -15,6 +15,8 @@ export interface BookFrontmatter {
     tags: string[];
     rating: BookRating;
     summary?: string;
+    /** 一句话简短评价 */
+    briefComment?: string;
     readDate?: Date;
     readTimeMinutes?: number;
     year?: number;
@@ -31,6 +33,13 @@ export interface BookReviewLink {
     pubDate: Date;
 }
 
+/** 书籍基础信息（用于书评页展示关联书籍） */
+export interface BookInfo {
+    title: string;
+    author: string;
+    cover: string;
+}
+
 /** 传给前端组件使用的轻量元信息 */
 export interface BookMeta {
     id: string;
@@ -41,6 +50,8 @@ export interface BookMeta {
     tags: string[];
     rating: BookRating;
     summary: string;
+    /** 一句话简短评价 */
+    briefComment: string;
     readDate: Date | null;
     readTimeMinutes: number | null;
     year: number | null;

@@ -43,6 +43,7 @@ const booksCollection = defineCollection({
         tags: z.array(z.string()).nonempty(),
         rating: z.enum(['recommended', 'neutral', 'not-recommended']),
         summary: z.string().optional().default(''),
+        briefComment: z.string().optional().default(''),
         readDate: z.date().optional(),
         readTimeMinutes: z.number().int().nonnegative().optional(),
         year: z.number().int().optional(),
@@ -52,26 +53,34 @@ const booksCollection = defineCollection({
 })
 
 const columnsCollection = defineCollection({
-    loader: glob({ pattern: '**/[^_]*.md', base: "./src/content/columns" }),
+    loader: glob({
+        pattern: '**/*.md',
+        base: "./src/content/columns",
+        generateId: ({ entry }) => entry.replace(/\.md$/, ''),
+    }),
     schema: z.object({
         title: z.string(),
+        pubDate: z.date().optional(),
         description: z.string().optional().default(''),
         icon: z.string().optional(),
+        image: z.string().optional().default(''),
+        tags: z.array(z.string()).optional(),
         pinTop: z.number().int().optional().default(0),
         draft: z.boolean().optional().default(false),
     }),
 })
 
-const columnArticlesCollection = defineCollection({
-    loader: glob({ pattern: '**/[^_]*.md', base: "./src/content/column-articles" }),
+const articlesCollection = defineCollection({
+    loader: glob({ pattern: '**/[^_]*.md', base: "./src/content/articles" }),
     schema: z.object({
         title: z.string(),
-        pubDate: z.date(),
-        draft: z.boolean().optional().default(false),
         description: z.string().optional().default(''),
-        image: z.string().optional().default(''),
+        link: z.string().url(),
+        pubDate: z.date(),
         tags: z.array(z.string()).optional(),
-        columnSlug: z.string(),
+        image: z.string().optional().default(''),
+        draft: z.boolean().optional().default(false),
+        pinTop: z.number().int().optional().default(0),
     }),
 })
 
@@ -81,5 +90,5 @@ export const collections = {
     books: booksCollection,
     bookReview: bookReviewCollection,
     columns: columnsCollection,
-    columnArticles: columnArticlesCollection,
+    articles: articlesCollection,
 }

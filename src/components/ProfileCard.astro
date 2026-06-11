@@ -10,26 +10,27 @@ const t = i18nit(currentLang);
 
 const { avatar, name, description, motto, links = [] } = profileConfig;
 
-// Resolve avatar URL. Supports three forms in `profileConfig.avatar`:
-//   1. http(s):// or data: URL -> passed through as-is
-//   2. "/..." path -> treated as a /public asset
-//   3. relative path like "assets/Motues.jpg" -> looked up via
-//      import.meta.glob against /src so Vite emits the hashed asset URL
-const isAbsoluteOrData = (s: string) =>
-    /^([a-z]+:)?\/\//i.test(s) || s.startsWith("data:");
-
-// Eager glob: each key is the source path (relative to this file), each
-// value is the asset URL Vite/Astro will emit at build time.
+// Resolve asset URLs via import.meta.glob
 const srcAssetMap = import.meta.glob<string>(
     '../assets/*.{jpg,jpeg,png,webp,gif,svg,ico}',
     { eager: true, query: '?url', import: 'default' }
 );
 
-const avatarSrc = isAbsoluteOrData(avatar)
-    ? avatar
-    : avatar.startsWith("/")
-        ? avatar
-        : (srcAssetMap[`../${avatar}`] ?? `/${avatar}`);
+const isAbsoluteOrData = (s: string) =>
+    /^([a-z]+:)?\/\//i.test(s) || s.startsWith("data:");
+
+function resolveAsset(path: string): string {
+    if (isAbsoluteOrData(path) || path.startsWith("/")) return path;
+    return srcAssetMap[`../${path}`] ?? `/${path}`;
+}
+
+const avatarSrc = resolveAsset(avatar);
+
+// Pre-resolve QR code images from assets
+const resolvedLinks = links.map(link => ({
+    ...link,
+    resolvedQr: link.qrCode ? resolveAsset(link.qrCode) : null,
+}));
 ---
 
 <aside
@@ -69,50 +70,61 @@ const avatarSrc = isAbsoluteOrData(avatar)
     <!-- Divider -->
     <div class="border-t border-[var(--button-border-color)] my-3"></div>
 
-    <!-- Contact links -->
-    {links.length > 0 && (
-        <div>
-            <p class="text-xs font-semibold text-[var(--text-color-70)] uppercase tracking-wider mb-2">
-                {t("profileCard.contact")}
-            </p>
-            <ul class="space-y-1.5">
-                {links.map((link) => (
-                    <li>
-                        {link.copyable ? (
-                            <button
-                                type="button"
-                                class="profile-link w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm text-[var(--text-color)] hover:bg-[var(--button-hover-color)] active:scale-[0.98] transition-all duration-200"
-                                data-copy-value={link.url}
-                                data-copy-success={t("profileCard.copySuccess")}
-                                data-copy-failed={t("profileCard.copyFailed")}
-                                aria-label={`${t("profileCard.copy")} ${link.name}`}
-                            >
-                                <Icon name={link.icon} class="w-4 h-4 shrink-0" style={link.color ? `color:${link.color}` : undefined} />
-                                <span class="truncate">{link.name}</span>
-                                <Icon name="fa6-solid:copy" class="w-3 h-3 ml-auto opacity-50 shrink-0" />
-                            </button>
-                        ) : (
-                            <a
-                                href={link.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="profile-link w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm text-[var(--text-color)] hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)] transition-all duration-200"
-                            >
-                                <Icon name={link.icon} class="w-4 h-4 shrink-0" style={link.color ? `color:${link.color}` : undefined} />
-                                <span class="truncate">{link.name}</span>
-                                <Icon name="fa6-solid:arrow-up-right-from-square" class="w-3 h-3 ml-auto opacity-50 shrink-0" />
-                            </a>
-                        )}
-                    </li>
-                ))}
-            </ul>
+    <!-- Contact icons — horizontal row, no text -->
+    {resolvedLinks.length > 0 && (
+        <div class="flex items-center justify-center gap-3">
+            {resolvedLinks.map((link) => (
+                <div class="relative group/link">
+                    {link.copyable ? (
+                        <button
+                            type="button"
+                            class="profile-link flex items-center justify-center w-9 h-9 rounded-full text-[var(--text-color)] hover:bg-[var(--button-hover-color)] hover:text-[var(--link-color)] active:scale-90 transition-all duration-200"
+                            data-copy-value={link.url}
+                            data-copy-success={t("profileCard.copySuccess")}
+                            data-copy-failed={t("profileCard.copyFailed")}
+                            aria-label={`${t("profileCard.copy")} ${link.name}`}
+                        >
+                            <Icon name={link.icon} class="w-4.5 h-4.5" />
+                        </button>
+                    ) : link.resolvedQr ? (
+                        <!-- QR-only: hover 显示二维码，不跳转 -->
+                        <div
+                            class="profile-link flex items-center justify-center w-9 h-9 rounded-full text-[var(--text-color)] hover:bg-[var(--button-hover-color)] hover:text-[var(--link-color)] transition-all duration-200 cursor-default"
+                            aria-label={link.name}
+                        >
+                            <Icon name={link.icon} class="w-4.5 h-4.5" />
+                        </div>
+                    ) : (
+                        <a
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="profile-link flex items-center justify-center w-9 h-9 rounded-full text-[var(--text-color)] hover:bg-[var(--button-hover-color)] hover:text-[var(--link-color)] active:scale-90 transition-all duration-200"
+                            aria-label={link.name}
+                        >
+                            <Icon name={link.icon} class="w-4.5 h-4.5" />
+                        </a>
+                    )}
+                    {link.resolvedQr && (
+                        <div class="qr-popup absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover/link:block z-50 pointer-events-none">
+                            <div class="bg-white rounded-lg shadow-xl border border-gray-200 p-2">
+                                <img src={link.resolvedQr} alt={`${link.name} QR`} class="w-32 h-32 object-contain" />
+                            </div>
+                            <div class="w-2.5 h-2.5 bg-white border-r border-b border-gray-200 absolute left-1/2 -translate-x-1/2 -bottom-1.5 rotate-45"></div>
+                        </div>
+                    )}
+                </div>
+            ))}
         </div>
     )}
+
+    <!-- Copy success tooltip -->
+    <div id="copy-toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[999] px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-sm font-medium shadow-lg opacity-0 pointer-events-none transition-opacity duration-300"></div>
 </aside>
 
 <style>
     .profile-card :global(.profile-link:hover) :global(svg) {
-        transform: scale(1.1);
+        transform: scale(1.15);
     }
     .profile-card :global(.profile-link svg) {
         transition: transform 0.2s ease;
@@ -137,7 +149,6 @@ const avatarSrc = isAbsoluteOrData(avatar)
                     if (navigator.clipboard && window.isSecureContext) {
                         await navigator.clipboard.writeText(value);
                     } else {
-                        // Fallback for non-secure contexts
                         const ta = document.createElement('textarea');
                         ta.value = value;
                         ta.style.position = 'fixed';
@@ -147,27 +158,22 @@ const avatarSrc = isAbsoluteOrData(avatar)
                         document.execCommand('copy');
                         document.body.removeChild(ta);
                     }
-                    flashFeedback(btn, successMsg);
+                    showToast(successMsg);
                 } catch (err) {
                     console.error('Copy failed:', err);
-                    flashFeedback(btn, failedMsg);
+                    showToast(failedMsg);
                 }
             });
         });
     }
 
-    function flashFeedback(btn: HTMLButtonElement, msg: string) {
-        const original = btn.innerHTML;
-        btn.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4 shrink-0 text-green-500">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-            </svg>
-            <span class="truncate">${msg}</span>
-        `;
-        btn.disabled = true;
+    function showToast(msg: string) {
+        const toast = document.getElementById('copy-toast');
+        if (!toast) return;
+        toast.textContent = msg;
+        toast.style.opacity = '1';
         setTimeout(() => {
-            btn.innerHTML = original;
-            btn.disabled = false;
+            toast.style.opacity = '0';
         }, 1500);
     }
 

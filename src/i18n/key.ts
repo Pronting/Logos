@@ -141,7 +141,8 @@ export interface Translation {
         year: string;
         author: string;
         summary: string;
-        myReview: string;
+        reviewArticle: string;
+        briefComment: string;
         noResults: string;
         noReview: string;
         readReview: string;

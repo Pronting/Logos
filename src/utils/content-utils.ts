@@ -85,3 +85,80 @@ export async function getSpec(
     if(!collection) collection = await getEntry('spec', `${spec}/${defaultLanguage}`);
     return collection;
 }
+
+/**
+ * 获取排序后的文章条目（好文推荐）
+ * @param lang 当前语言
+ * @param filter 过滤函数，可选
+ * @param sort 排序函数，可选
+ * @returns 排序后的文章条目数组
+ */
+export type ArticleEntryWithLocaleStatus = CollectionEntry<'articles'> & {
+  isFallback?: boolean;
+};
+
+export async function getArticles(
+  lang: string,
+  filter?: (entry: CollectionEntry<'articles'>) => boolean | undefined,
+  sort?: (a: CollectionEntry<'articles'>, b: CollectionEntry<'articles'>) => number
+): Promise<ArticleEntryWithLocaleStatus[]> {
+  const defaultFilter = ({ data }: CollectionEntry<'articles'>) => {
+    return import.meta.env.PROD ? data.draft !== true : true;
+  };
+
+  const defaultSort = (a: CollectionEntry<'articles'>, b: CollectionEntry<'articles'>) => {
+    const pinTopA = a.data.pinTop ?? 0;
+    const pinTopB = b.data.pinTop ?? 0;
+    if (pinTopA > 0 && pinTopB > 0) return pinTopB - pinTopA;
+    if (pinTopA > 0) return -1;
+    if (pinTopB > 0) return 1;
+    return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+  };
+
+  const articleEntries = await getCollection('articles', filter || defaultFilter);
+
+  const grouped = new Map<string, Record<string, CollectionEntry<'articles'>>>();
+  const defaultLanguage = i18n.defaultLocale;
+
+  for (const article of articleEntries) {
+    const parts = article.id.split('/');
+    const fileName = parts[parts.length - 1];
+    const id = parts.slice(0, -1).join('/');
+    const language: string = fileName.replace('.md', '');
+
+    if (!grouped.has(id)) {
+      grouped.set(id, {});
+    }
+    grouped.get(id)![language] = article;
+  }
+
+  const selectedEntries: ArticleEntryWithLocaleStatus[] = [];
+
+  for (const [id, translations] of grouped.entries()) {
+    let selectedArticle: CollectionEntry<'articles'> | undefined;
+    let isFallback = false;
+
+    if (lang && lang !== defaultLanguage) {
+      if (translations[lang]) {
+        selectedArticle = translations[lang];
+      } else if (translations[defaultLanguage]) {
+        selectedArticle = translations[defaultLanguage];
+        isFallback = true;
+      }
+    } else {
+      if (translations[defaultLanguage]) {
+        selectedArticle = translations[defaultLanguage];
+      }
+    }
+
+    if (selectedArticle) {
+      selectedEntries.push({
+        ...selectedArticle,
+        id: id,
+        isFallback: isFallback
+      });
+    }
+  }
+
+  return selectedEntries.sort(sort || defaultSort);
+}

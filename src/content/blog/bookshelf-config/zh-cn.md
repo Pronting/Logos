@@ -40,6 +40,7 @@ author: "兰小欢"                        # 作者（必填）
 tags: ["政治经济学"]                     # 领域标签（必填，可多个）
 rating: "recommended"                   # 评价（必填）
 summary: "一部理解中国经济发展与政府角色的入门佳作。"  # 简介（可选，弹窗展示）
+briefComment: "非常推荐的一本经济学入门读物。"        # 简短评价（可选，弹窗展示的一句话评价）
 cover: "/covers/example.jpg"            # 封面图路径（可选，放在 public/ 下）
 readDate: 2025-12-15                    # 读完日期（可选，弹窗展示）
 readTimeMinutes: 480                    # 阅读耗时/分钟（可选，弹窗展示）
@@ -65,7 +66,7 @@ draft: false                            # 草稿（可选，true 则生产环境
 
 ## 书评正文
 
-Frontmatter 下方的 Markdown 正文即为**我的书评**。目前书评在弹窗中以纯文本形式展示，后续版本将支持 Markdown 富文本渲染。
+Frontmatter 下方的 Markdown 正文即为**书评文章**。目前书评在弹窗中以纯文本形式展示，后续版本将支持 Markdown 富文本渲染。
 
 ```markdown
 ---
@@ -92,6 +93,27 @@ cover: "/covers/zhi-shen-shi-nei.jpg"
 
 ---
 
+## 深度链接
+
+书架页面支持通过 URL 参数直接打开某本书的详情弹窗：
+
+```
+/bookshelf/?book=example-book
+```
+
+其中 `book` 参数的值为书籍的目录名（即 slug）。这一机制用于**书评 → 书架**的跳转：书评详情页的「所属书籍」卡片会生成带 `?book=` 参数的链接，点击后书架页面会自动定位并打开对应书籍。
+
+### 双向链接
+
+书架与书评之间通过 `bookSlug` 字段实现双向链接：
+
+- **书架 → 书评**：详情弹窗底部「书评文章」区域自动列出关联书评
+- **书评 → 书架**：书评页显示「所属书籍」卡片，点击跳转到书架并打开详情
+
+只要在书评的 frontmatter 中正确设置了 `bookSlug`，双向链接自动生效。详见[书籍与书评发布指南](/blog/intro/book-review/)。
+
+---
+
 ## 完整示例
 
 以下是 `src/content/books/置身事内/zh-cn.md` 的完整内容：
@@ -103,6 +125,7 @@ author: "兰小欢"
 tags: ["政治经济学"]
 rating: "recommended"
 summary: "一部理解中国经济发展与政府角色的入门佳作。"
+briefComment: "非常推荐的一本经济学入门读物。"
 readDate: 2025-12-15
 readTimeMinutes: 480
 year: 2021

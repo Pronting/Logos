@@ -36,6 +36,7 @@ cover: "https://img.example.com/cover.jpg"  # 封面图，支持图床链接或�
 tags: ["政治经济学"]                          # 领域标签，支持多个
 rating: "recommended"                        # 推荐等级：recommended / neutral / not-recommended
 summary: "一部理解中国经济发展与政府角色的入门佳作"
+briefComment: "非常推荐的一本经济学入门读物。"      # 简短评价（可选，一句话评价）
 readDate: 2025-12-15                         # 阅读日期
 readTimeMinutes: 480                         # 阅读时长（分钟）
 year: 2021                                   # 出版年份
@@ -54,6 +55,7 @@ draft: false                                 # 是否草稿
 | `tags` | ✅ | 领域标签数组，用于分组和筛选。**新增领域无需修改代码，自动从数据中统计** |
 | `rating` | ✅ | 个人评价：`recommended`（推荐）、`neutral`（中庸）、`not-recommended`（不推荐） |
 | `summary` | ❌ | 书籍简介，显示在详情弹窗 |
+| `briefComment` | ❌ | 一句话简短评价，显示在详情弹窗简介与书评文章之间 |
 | `readDate` | ❌ | 阅读时间 |
 | `readTimeMinutes` | ❌ | 阅读时长（分钟） |
 | `year` | ❌ | 出版年份 |
@@ -114,6 +116,35 @@ src/content/books/example-book/zh-cn.md  →  bookSlug: "example-book"
 - 书架详情页会自动展示所有关联的书评链接，支持点击跳转
 :::
 
+## 双向链接机制
+
+书架与书评之间通过 `bookSlug` 字段实现**双向链接**：
+
+| 方向 | 触发位置 | 实现方式 |
+| :--- | :--- | :--- |
+| 书架 → 书评 | 书籍详情弹窗的「书评文章」区域 | 系统读取所有书评的 `bookSlug`，自动匹配并生成链接 |
+| 书评 → 书架 | 书评详情页标题下方的「所属书籍」卡片 | 系统读取书评的 `bookSlug`，查找对应书籍信息并生成链接 |
+
+### 书架 → 书评
+
+在书架页面点击任意书籍卡片打开详情弹窗后，底部的「书评文章」区域会列出所有 `bookSlug` 匹配的书评文章。点击即可跳转到对应书评。
+
+### 书评 → 书架
+
+在书评详情页的标题下方，会显示一个「所属书籍」卡片，包含书籍封面、书名和作者。点击该卡片会跳转到书架页面，并**自动打开对应书籍的详情弹窗**。
+
+这一跳转通过 URL 参数 `?book={bookSlug}` 实现深度链接。例如：
+
+```
+/bookshelf/?book=置身事内
+```
+
+会直接打开《置身事内》的详情弹窗，无需手动查找。
+
+:::tip
+只要正确设置了 `bookSlug`，双向链接会自动生效，无需额外配置。
+:::
+
 ## 完整示例
 
 ### 第一步：添加书籍
@@ -128,6 +159,7 @@ cover: "https://img.example.com/yuanze.jpg"
 tags: ["金融学", "管理学"]
 rating: "recommended"
 summary: "桥水基金创始人的人生与工作原则"
+briefComment: "一套可复用的决策框架，值得反复阅读。"
 readDate: 2026-01-10
 readTimeMinutes: 600
 year: 2017
@@ -158,7 +190,7 @@ rating: "recommended"
 运行 `pnpm build`，确认：
 - 书架页面出现《原则》卡片
 - 书评页面出现《原则 读后》文章
-- 书架详情弹窗的「我的书评」区域显示可点击的书评链接
+- 书架详情弹窗的「书评文章」区域显示可点击的书评链接
 
 ## 常见问题
 

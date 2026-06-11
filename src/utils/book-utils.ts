@@ -2,7 +2,7 @@ import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import { i18n } from "astro:config/client";
 
-import type { BookEntry, BookFilter, BookMeta, BookRating, BookReviewLink } from "@/types/book";
+import type { BookEntry, BookFilter, BookInfo, BookMeta, BookRating, BookReviewLink } from "@/types/book";
 
 /**
  * 把 CollectionEntry 转成轻量 BookMeta，传给客户端组件。
@@ -16,15 +16,20 @@ export function toBookMeta(
     const tags = (data.tags ?? []).flatMap((tag) =>
         tag.split(",").map((t) => t.trim()).filter(Boolean)
     );
+    // entry.id = "example-book/zh-cn"，去掉末尾 locale 后缀得到纯目录名 slug
+    const parts = entry.id.split("/");
+    const slug = parts.length > 1 ? parts.slice(0, -1).join("/") : entry.id;
+
     return {
         id: entry.id,
-        slug: entry.id,
+        slug,
         title: data.title,
         author: data.author,
         cover: data.cover ?? "",
         tags,
         rating: data.rating,
         summary: data.summary ?? "",
+        briefComment: data.briefComment ?? "",
         readDate: data.readDate ?? null,
         readTimeMinutes: data.readTimeMinutes ?? null,
         year: data.year ?? null,
@@ -142,6 +147,31 @@ export async function buildBookReviewMap(
             pubDate: review.data.pubDate,
         });
         map.set(slug, links);
+    }
+
+    return map;
+}
+
+/**
+ * 构建书籍 slug → 基础信息的映射。
+ * 供书评详情页展示关联书籍的封面、书名、作者。
+ */
+export async function buildBookInfoMap(
+    lang: string,
+): Promise<Map<string, BookInfo>> {
+    const books = await getBooks(lang);
+    const map = new Map<string, BookInfo>();
+
+    for (const book of books) {
+        // book.id = "example-book/zh-cn"，需要去掉末尾 locale 后缀
+        // 与 bookSlug（纯目录名）对齐
+        const parts = book.id.split("/");
+        const slug = parts.length > 1 ? parts.slice(0, -1).join("/") : book.id;
+        map.set(slug, {
+            title: book.data.title,
+            author: book.data.author,
+            cover: book.data.cover ?? "",
+        });
     }
 
     return map;

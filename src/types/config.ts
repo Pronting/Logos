@@ -30,6 +30,7 @@ export type ProfileLink = {
     icon: string;     // iconify icon name, e.g. "fa6-brands:github"
     color?: string;   // optional hover color (CSS color value)
     copyable?: boolean; // if true, clicking copies url to clipboard (for email etc.)
+    qrCode?: string;  // optional QR code image path, shown on hover
 };
 
 export type ProfileConfig = {

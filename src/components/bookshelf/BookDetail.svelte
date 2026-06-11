@@ -10,7 +10,8 @@
     yearLabel: string;
     authorLabel: string;
     summaryLabel: string;
-    myReviewLabel: string;
+    briefCommentLabel: string;
+    reviewArticleLabel: string;
     ratingRecommended: string;
     ratingNeutral: string;
     ratingNotRecommended: string;
@@ -27,7 +28,8 @@
     yearLabel,
     authorLabel,
     summaryLabel,
-    myReviewLabel,
+    briefCommentLabel,
+    reviewArticleLabel,
     ratingRecommended,
     ratingNeutral,
     ratingNotRecommended,
@@ -175,8 +177,15 @@
           </div>
         {/if}
 
+        {#if book.briefComment}
+          <div>
+            <h3 class="text-sm font-semibold text-[var(--text-color)] mb-2">{briefCommentLabel}</h3>
+            <p class="text-sm text-[var(--text-color-70)] leading-relaxed italic">「{book.briefComment}」</p>
+          </div>
+        {/if}
+
         <div>
-          <h3 class="text-sm font-semibold text-[var(--text-color)] mb-2">{myReviewLabel}</h3>
+          <h3 class="text-sm font-semibold text-[var(--text-color)] mb-2">{reviewArticleLabel}</h3>
           {#if book.reviewLinks && book.reviewLinks.length > 0}
             <ul class="space-y-2">
               {#each book.reviewLinks as link}

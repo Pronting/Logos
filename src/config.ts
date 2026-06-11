@@ -42,21 +42,24 @@ export const profileConfig: ProfileConfig = {
     links: [
         {
             name: "GitHub",
-            url: "https://github.com/Pronting/Logos",
+            url: "https://github.com/Pronting",
             icon: "fa6-brands:github",
-            color: "#181717",
+        },
+        {
+            name: "微信",
+            url: "#",
+            icon: "fa6-brands:weixin",
+            qrCode: "assets/wechat-qr-code.jpg",
         },
         {
             name: "博客园",
             url: "https://www.cnblogs.com/pronting",
             icon: "fa6-solid:newspaper",
-            color: "#2e7d32",
         },
         {
             name: "realpront@outlook.com",
             url: "realpront@outlook.com",
             icon: "fa6-solid:envelope",
-            color: "#0078d4",
             copyable: true,
         },
     ],

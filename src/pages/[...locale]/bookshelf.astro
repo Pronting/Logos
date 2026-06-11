@@ -21,7 +21,12 @@ const t = i18nit(currentLang);
 
 const bookEntries = await getBooks(currentLang);
 const reviewMap = await buildBookReviewMap(currentLang);
-const books = bookEntries.map((entry) => toBookMeta(entry, reviewMap.get(entry.id)));
+const books = bookEntries.map((entry) => {
+    // entry.id = "example-book/zh-cn"，需要去掉 locale 后缀才能匹配 bookSlug
+    const parts = entry.id.split("/");
+    const slug = parts.length > 1 ? parts.slice(0, -1).join("/") : entry.id;
+    return toBookMeta(entry, reviewMap.get(slug));
+});
 const pageTitle = `${t("header.bookshelf")} - ${siteConfig.title}`;
 ---
 

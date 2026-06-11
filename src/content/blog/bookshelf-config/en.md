@@ -40,6 +40,7 @@ author: "Author Name"                   # Required
 tags: ["Philosophy", "Literature"]      # Required, array
 rating: "recommended"                   # Required: recommended | neutral | not-recommended
 summary: "A short description..."       # Optional, shown in modal
+briefComment: "A one-sentence review."     # Optional, brief comment shown in modal
 cover: "/covers/cover.jpg"              # Optional, path under public/
 readDate: 2025-12-15                    # Optional, shown in modal
 readTimeMinutes: 480                    # Optional, minutes
@@ -78,3 +79,24 @@ cover: "/covers/my-cover.jpg"
 ```
 
 If no `cover` is set, a placeholder book icon will be shown.
+
+---
+
+## Deep Linking
+
+The bookshelf supports opening a specific book's detail modal via URL parameter:
+
+```
+/bookshelf/?book=example-book
+```
+
+The `book` parameter value is the book's directory name (slug). This enables **review → bookshelf** navigation: the "Related Book" card on a review page generates a link with `?book=`, so clicking it opens the bookshelf with the book detail already displayed.
+
+### Bidirectional Links
+
+Books and reviews are linked bidirectionally via the `bookSlug` field:
+
+- **Bookshelf → Review**: The detail modal's "Review Articles" section automatically lists matching reviews
+- **Review → Bookshelf**: The review page shows a "Related Book" card that links back to the bookshelf
+
+As long as `bookSlug` is correctly set in the review's frontmatter, bidirectional links work automatically. See the [Book & Review Publishing Guide](/blog/intro/book-review/) for details.
