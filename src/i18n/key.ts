@@ -166,5 +166,10 @@ export interface Translation {
         noColumns: string;
         backToList: string;
         series: string;
+    },
+    siteStats: {
+        articles: string;
+        runningDays: string;
+        runningYears: string;
     }
 }

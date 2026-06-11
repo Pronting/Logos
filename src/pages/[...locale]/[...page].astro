@@ -5,6 +5,7 @@ import PostPage from '@components/PostPage.astro';
 import ProfileCard from '@components/ProfileCard.astro';
 import Navi from '@components/control/Navi.astro';
 import FabMenu from '@components/control/FabMenu.astro';
+import SiteStats from '@components/SiteStats.astro';
 
 import { getBlogEntrySort } from '@utils/content-utils'
 import { siteConfig } from '@/config';
@@ -80,5 +81,6 @@ const pageTitle = `${siteConfig.title} - ${siteConfig.subTitle}`;
             </div>
         </div>
     </div>
+    <SiteStats />
     <FabMenu showBackBottom={true} />
 </MainPageLayout>

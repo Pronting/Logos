@@ -168,6 +168,11 @@ const translation: Translation = {
         noColumns: "暂无专栏",
         backToList: "返回专栏",
         series: "系列文章",
+    },
+    siteStats: {
+        articles: "共 {count} 篇文章",
+        runningDays: "已运行 {days} 天",
+        runningYears: "已运行 {years} 年 {days} 天",
     }
 }
 

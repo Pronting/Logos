@@ -168,6 +168,11 @@ const translation: Translation = {
         noColumns: "No columns yet",
         backToList: "Back to Columns",
         series: "Series",
+    },
+    siteStats: {
+        articles: "{count} articles in total",
+        runningDays: "Running for {days} days",
+        runningYears: "Running for {years} years {days} days",
     }
 }
 

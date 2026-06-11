@@ -1,0 +1,66 @@
+---
+import { getCollection } from 'astro:content';
+import { i18n } from "astro:config/client";
+import { profileConfig } from '@/config';
+import i18nit from '@i18n/translation';
+
+const currentLang = Astro.currentLocale || i18n!.defaultLocale;
+const t = i18nit(currentLang);
+
+// 统计所有 tab 的文章数量（去重后按语言解析）
+const defaultLang = i18n!.defaultLocale;
+
+function countByLocale(entries: { id: string }[]): number {
+  const grouped = new Map<string, Set<string>>();
+  for (const entry of entries) {
+    const parts = entry.id.split('/');
+    const fileName = parts[parts.length - 1];
+    const dirId = parts.slice(0, -1).join('/');
+    const lang = fileName.replace('.md', '');
+    if (!grouped.has(dirId)) grouped.set(dirId, new Set());
+    grouped.get(dirId)!.add(lang);
+  }
+  let count = 0;
+  for (const langs of grouped.values()) {
+    // 每个目录只计数一次（优先当前语言，否则默认语言）
+    if (langs.has(currentLang) || langs.has(defaultLang)) count++;
+  }
+  return count;
+}
+
+const defaultFilter = ({ data }: any) => {
+  return import.meta.env.PROD ? data.draft !== true : true;
+};
+
+const [blogEntries, articleEntries, columnArticleEntries] = await Promise.all([
+  getCollection('blog', defaultFilter),
+  getCollection('articles', defaultFilter),
+  getCollection('columnArticles', defaultFilter),
+]);
+
+const totalArticles = countByLocale(blogEntries) + countByLocale(articleEntries) + countByLocale(columnArticleEntries);
+
+// 计算运行时间
+const startDate = new Date(profileConfig.startYear, 0, 1);
+const now = new Date();
+const diffMs = now.getTime() - startDate.getTime();
+const totalDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+const years = Math.floor(totalDays / 365);
+const days = totalDays % 365;
+
+const runningText = years > 0
+  ? t("siteStats.runningYears", { years: String(years), days: String(days) })
+  : t("siteStats.runningDays", { days: String(totalDays) });
+---
+
+<div class="site-stats text-center py-4 text-xs text-[var(--text-color-50)]">
+  <span>{t("siteStats.articles", { count: String(totalArticles) })}</span>
+  <span class="mx-2">·</span>
+  <span>{runningText}</span>
+</div>
+
+<style>
+  .site-stats {
+    font-family: "EB Garamond", cursive !important;
+  }
+</style>
