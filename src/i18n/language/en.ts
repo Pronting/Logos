@@ -29,6 +29,7 @@ const translation: Translation = {
             bookReview: "Read ten thousand books, travel ten thousand miles",
             bookshelf: "Read widely, think deeply",
             articles: "Curated good reads from the web",
+            articlesCount: "{count} curated articles",
             about: "A minimalist blog template",
             friends: "Interesting Souls",
         }
@@ -150,6 +151,9 @@ const translation: Translation = {
         statsRecommended: "recommended",
         statsDomains: "domains",
     },
+    bookReview: {
+        relatedBook: "Related Book",
+    },
     themeInfo: {
         light: "Switch to Light Mode",
         dark: "Switch to Dark Mode",
@@ -173,6 +177,9 @@ const translation: Translation = {
         articles: "{count} articles in total",
         runningDays: "Running for {days} days",
         runningYears: "Running for {years} years {days} days",
+    },
+    articles: {
+        noResults: "No curated articles yet",
     }
 }
 

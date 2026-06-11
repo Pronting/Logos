@@ -27,6 +27,7 @@ export interface Translation {
             bookReview: string;
             bookshelf: string;
             articles: string;
+            articlesCount: string;
             about: string;
             friends: string;
         };
@@ -148,6 +149,9 @@ export interface Translation {
         statsRecommended: string;
         statsDomains: string;
     };
+    bookReview: {
+        relatedBook: string;
+    };
     themeInfo: {
         light: string;
         dark: string;
@@ -171,5 +175,8 @@ export interface Translation {
         articles: string;
         runningDays: string;
         runningYears: string;
+    },
+    articles: {
+        noResults: string;
     }
 }

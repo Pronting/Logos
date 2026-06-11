@@ -29,6 +29,7 @@ const translation: Translation = {
             bookReview: "读万卷书，行万里路",
             bookshelf: "博学而笃志，切问而近思",
             articles: "分享互联网上的好文章",
+            articlesCount: "共收录 {count} 篇好文",
             about: "一个极简的Blog模板",
             friends: "有趣的灵魂",
         }
@@ -150,6 +151,9 @@ const translation: Translation = {
         statsRecommended: "本推荐",
         statsDomains: "个领域",
     },
+    bookReview: {
+        relatedBook: "所属书籍",
+    },
     themeInfo: {
         light: "切换到 浅色 模式",
         dark: "切换到 深色 模式",
@@ -173,6 +177,9 @@ const translation: Translation = {
         articles: "共 {count} 篇文章",
         runningDays: "已运行 {days} 天",
         runningYears: "已运行 {years} 年 {days} 天",
+    },
+    articles: {
+        noResults: "暂无好文推荐",
     }
 }
 
