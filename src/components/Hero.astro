@@ -3,6 +3,7 @@ import "@styles/global.css"
 import { heroConfig } from "@/config/hero"
 
 const { greeting, name, motto, tags } = heroConfig;
+// motto is now string[] — passed as JSON to data-mottos
 ---
 
 <div
@@ -23,7 +24,7 @@ const { greeting, name, motto, tags } = heroConfig;
         <span
             id="hero-motto"
             class="text-[var(--text-color-70)]"
-            data-motto={motto}
+            data-mottos={JSON.stringify(motto)}
         ></span>
         <span
             id="hero-cursor"
@@ -61,27 +62,58 @@ const { greeting, name, motto, tags } = heroConfig;
         const cursor = document.getElementById('hero-cursor');
         if (!el || !cursor) return;
 
-        const text = el.dataset.motto || '';
-        if (el.textContent && el.textContent.length >= text.length) return; // already typed
+        const mottos: string[] = JSON.parse(el.dataset.mottos || '[]');
+        if (mottos.length === 0) return;
 
         el.textContent = '';
         cursor.style.display = 'inline-block';
 
-        let i = 0;
-        const speed = 100; // ms per character
+        const TYPE_SPEED = 100;      // ms per character when typing
+        const BACK_SPEED = 50;       // ms per character when deleting
+        const PAUSE_AFTER_TYPE = 2000; // pause 2s after typing completes
+        const PAUSE_AFTER_DELETE = 300; // brief pause after deletion
 
-        function typeNext() {
-            if (i < text.length) {
-                el.textContent += text[i];
-                i++;
-                setTimeout(typeNext, speed);
-            } else {
-                // Keep cursor blinking after typing completes
+        let mottoIndex = 0;
+
+        function typeText(text: string, onComplete: () => void) {
+            let i = 0;
+            function typeNext() {
+                if (i < text.length) {
+                    el!.textContent += text[i];
+                    i++;
+                    setTimeout(typeNext, TYPE_SPEED);
+                } else {
+                    setTimeout(onComplete, PAUSE_AFTER_TYPE);
+                }
             }
+            typeNext();
+        }
+
+        function deleteText(onComplete: () => void) {
+            function deleteNext() {
+                const current = el!.textContent || '';
+                if (current.length > 0) {
+                    el!.textContent = current.slice(0, -1);
+                    setTimeout(deleteNext, BACK_SPEED);
+                } else {
+                    setTimeout(onComplete, PAUSE_AFTER_DELETE);
+                }
+            }
+            deleteNext();
+        }
+
+        function loop() {
+            const text = mottos[mottoIndex];
+            typeText(text, () => {
+                deleteText(() => {
+                    mottoIndex = (mottoIndex + 1) % mottos.length;
+                    loop();
+                });
+            });
         }
 
         // Small delay so the AOS fade-up settles first
-        setTimeout(typeNext, 600);
+        setTimeout(loop, 600);
     }
 
     document.addEventListener('astro:page-load', runTypewriter);
