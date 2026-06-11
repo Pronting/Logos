@@ -2,7 +2,7 @@ FROM node:22-alpine AS builder
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@latest --activate
 COPY package.json pnpm-lock.yaml ./
-RUN corepack enable && pnpm config set onlyBuiltDependencies '["esbuild","sharp"]' && pnpm install
+RUN node -e "const p=require('./package.json');p.pnpm={onlyBuiltDependencies:['esbuild','sharp']};require('fs').writeFileSync('./package.json',JSON.stringify(p,null,2))" && pnpm install
 COPY . .
 RUN pnpm build
 
