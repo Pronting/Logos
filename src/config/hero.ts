@@ -4,19 +4,19 @@
  * 直接修改下方字符串即可更新首页展示内容。
  * greeting: 问候语
  * name: 你的名字
- * motto: 座右铭 / 个人简介（一行）
+ * motto: 座右铭数组，打字机循环展示
  * tags: 标签数组，可增删
  */
 export interface HeroConfig {
   greeting: string;
   name: string;
-  motto: string;
+  motto: string[];
   tags: string[];
 }
 
 export const heroConfig: HeroConfig = {
   greeting: "你好，我是",
   name: "pront",
-  motto: "持续发光发热",
+  motto: ["持续发光发热", "开源贡献者", "技术写作者", "终身学习者"],
   tags: ["开源贡献者", "技术写作者", "终身学习者"],
 };
