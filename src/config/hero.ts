@@ -40,11 +40,15 @@ export interface HeroConfig {
 export const heroConfig: HeroConfig = {
   greeting: "你好，我是",
   name: "pront",
-  motto: ["持续发光发热", "开源贡献者", "技术写作者", "终身学习者"],
-  tags: ["开源贡献者", "技术写作者", "终身学习者"],
+  motto: [
+    "开卷有益",
+    "凡我不能创造的，我就不能理解",
+    "文章千古事，得失寸心知",
+  ],
+  tags: ["代码", "阅读", "构建"],
   quote: "代码是写给人看的，顺便让机器执行。",
   quoteAuthor: "H. W. - Knuth spirit",
-  primaryCta: { label: "浏览文章", href: "/posts" },
+  primaryCta: { label: "浏览文章", href: "/tech" },
   secondaryCta: { label: "关于我", href: "/about" },
-  particles: { count: 40, color: "var(--text-color-70)", speed: 0.3 },
+  particles: { count: 40, color: "var(--text-color-70)", speed: 1.1 },
 };
