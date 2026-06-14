@@ -88,25 +88,33 @@ jobs:
 
       - name: 🖼 Attach images (optional)
         id: attach
-        if: ${{ secrets.GITHUB_TOKEN != '' }}
         env:
           CMS_REPO_ROOT: ${{ github.workspace }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           GH_ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::notice::GH_TOKEN not set, skipping attach-images"
+            echo "### 🖼 Attach images (skipped)" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
           echo "### 🖼 Attach images" >> $GITHUB_STEP_SUMMARY
           CMS_COLLECTION=$(node -e "console.log(JSON.parse(require('fs').readFileSync('.cms-tmp/payload.json','utf8')).category==='book'?'books':JSON.parse(require('fs').readFileSync('.cms-tmp/payload.json','utf8')).category==='book-review'?'book-review':JSON.parse(require('fs').readFileSync('.cms-tmp/payload.json','utf8')).category)" CMS_SLUG=$(node -e "console.log(JSON.parse(require('fs').readFileSync('.cms-tmp/payload.json','utf8')).payload.slug)") node script/cms/attach-images.mjs 2>&1 | tee -a $GITHUB_STEP_SUMMARY || echo "::warning::attach-images failed, continuing"
 
       - name: 🌐 Translate to en.md (optional)
         id: translate
-        if: ${{ secrets.LLM_API_KEY != '' }}
         env:
           CMS_REPO_ROOT: ${{ github.workspace }}
           LLM_BASE_URL: ${{ secrets.LLM_BASE_URL }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           LLM_MODEL: ${{ secrets.LLM_MODEL }}
         run: |
+          if [ -z "$LLM_API_KEY" ]; then
+            echo "::notice::LLM_API_KEY not set, skipping translate"
+            echo "### 🌐 Translate (skipped)" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
           echo "### 🌐 Translate" >> $GITHUB_STEP_SUMMARY
           SLUG=$(node -e "console.log(JSON.parse(require('fs').readFileSync('.cms-tmp/payload.json','utf8')).payload.slug)")
           COLLECTION=$(node -e "const c=JSON.parse(require('fs').readFileSync('.cms-tmp/payload.json','utf8')).category; console.log(c==='book'?'books':c==='book-review'?'book-review':c)")
