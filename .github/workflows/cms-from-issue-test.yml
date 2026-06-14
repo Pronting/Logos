@@ -68,7 +68,7 @@ jobs:
           echo "### 🔍 Parse" >> $GITHUB_STEP_SUMMARY
           node script/cms/parse-issue.mjs "$GITHUB_EVENT_PATH" 2>&1 | tee -a $GITHUB_STEP_SUMMARY
           if [ ! -f .cms-tmp/payload.json ]; then
-            echo "❌ parse failed, payload.json missing" >> $GITHUB_STEP_SUMMARY
+            echo "parse failed, payload.json missing" >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
 
@@ -88,7 +88,7 @@ jobs:
 
       - name: 🖼 Attach images (optional)
         id: attach
-        if: env.GH_TOKEN != ''
+        if: ${{ secrets.GITHUB_TOKEN != '' }}
         env:
           CMS_REPO_ROOT: ${{ github.workspace }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -100,7 +100,7 @@ jobs:
 
       - name: 🌐 Translate to en.md (optional)
         id: translate
-        if: env.LLM_API_KEY != ''
+        if: ${{ secrets.LLM_API_KEY != '' }}
         env:
           CMS_REPO_ROOT: ${{ github.workspace }}
           LLM_BASE_URL: ${{ secrets.LLM_BASE_URL }}
@@ -136,11 +136,14 @@ jobs:
           NUM=${{ github.event.issue.number }}
           SHA=$(git rev-parse HEAD)
           SHORT=$(echo $SHA | cut -c1-7)
-          BODY="✅ CMS push (test mode) — \`$CATEGORY/$SLUG\` → \`cms-test\` @ \`$SHORT\`
+          cat >/tmp/comment-body.md <<BODY_EOF
+          CMS push (test mode) — `$CATEGORY/$SLUG` → `cms-test` @ `$SHORT`
 
-📋 本次 push 推到 cms-test 分支（不部署）。本地验证命令: \`git fetch origin cms-test && git checkout cms-test && pnpm install && pnpm dev\`
+          本次 push 推到 cms-test 分支（不部署）。本地验证命令: `git fetch origin cms-test && git checkout cms-test && pnpm install && pnpm dev`
 
-验证通过后由你开 PR 合并到 main。"
+          验证通过后由你开 PR 合并到 main。
+          BODY_EOF
+          BODY=$(cat /tmp/comment-body.md)
           echo "### 💬 Comment" >> $GITHUB_STEP_SUMMARY
           echo "$BODY" | head -1 >> $GITHUB_STEP_SUMMARY
           curl -fsS -X POST \
@@ -159,9 +162,14 @@ jobs:
           NUM=${{ github.event.issue.number }}
           cat $GITHUB_STEP_SUMMARY > /tmp/summary.txt
           SUMMARY_TAIL=$(tail -30 /tmp/summary.txt)
-          BODY="❌ CMS push 失败 (test mode)。**调试**：打开 workflow run → 查看 step summary。See summary tail below.
+          cat >/tmp/failure-body.md <<BODY_EOF
+          CMS push 失败 (test mode)。**调试**：打开 workflow run → 查看 step summary。See summary tail below.
 
-$(cat /tmp/summary.txt | tail -30)"
+          ```
+          $(cat /tmp/summary.txt | tail -30)
+          ```
+          BODY_EOF
+          BODY=$(cat /tmp/failure-body.md)
           curl -fsS -X POST \
             -H "Authorization: token $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
@@ -172,5 +180,5 @@ $(cat /tmp/summary.txt | tail -30)"
             -H "Authorization: token $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/$GH_REPO/issues/$NUM/labels" \
-            -d "$(node -e "console.log(JSON.stringify({labels: ['cms/invalid']}))")" \
+            -d '{"labels":["cms/invalid"]}' \
             > /dev/null 2>&1 || true
