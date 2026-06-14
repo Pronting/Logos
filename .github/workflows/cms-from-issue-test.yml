@@ -8,6 +8,7 @@ on:
       issue_number:
         description: 'Issue number to reprocess (manual trigger)'
         required: true
+        type: string
 
 permissions:
   contents: write
