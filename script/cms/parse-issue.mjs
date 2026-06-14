@@ -69,26 +69,39 @@ function normalizeYamlIndent(text) {
   return text
 }
 
-function extractBodyAfterYaml(body) {
-  const idx = body.indexOf('```', body.indexOf('```yaml'))
-  if (idx === -1) return ''
-  return body.slice(idx).replace(/^```\s*/, '').trim()
+/**
+ * Split yaml text at the first `body: |` (or `body: >`) sentinel. Everything
+ * before becomes the frontmatter map; everything after becomes the markdown body.
+ * This is the safe boundary because the sentinel only appears once, and zod
+ * schemas don't allow a `body` field at the top level.
+ */
+function splitOnBodySentinel(yamlText) {
+  // match a top-level (no-indent) `body:` line followed by '|' or '>'
+  const m = /^(body:\s*[|>][+-]?\s*)$/m.exec(yamlText)
+  if (!m) {
+    return { frontmatter: yamlText, body: '' }
+  }
+  const idx = m.index
+  const frontmatter = yamlText.slice(0, idx).replace(/\s+$/, '')
+  const body = yamlText.slice(idx + m[0].length).replace(/^\s+/, '')
+  return { frontmatter, body }
 }
 
 export function parseIssueBody(body) {
-  const yamlText = normalizeYamlIndent(extractYamlBlock(body))
-  const obj = YAML.parse(yamlText)
+  const rawYaml = normalizeYamlIndent(extractYamlBlock(body))
+  const { frontmatter, body: bodyContent } = splitOnBodySentinel(rawYaml)
+  const obj = YAML.parse(frontmatter)
   if (!obj || typeof obj !== 'object') {
     throw new Error('YAML block did not parse to an object')
   }
   const category = obj.category
   const cat = categorySchema.parse(category)
   const schema = schemaByCategory[cat]
-  // Pull only known fields
+  // Pull only known fields (drop body sentinel, it's the markdown body)
   const raw = { ...obj }
   delete raw.category
+  delete raw.body
   const payload = schema.parse(raw)
-  const bodyContent = extractBodyAfterYaml(body ?? '')
   return { category: cat, payload: { ...payload, body: bodyContent } }
 }
 

@@ -63,4 +63,27 @@ describe('parseIssueBody', () => {
     expect(out.payload.title).toBe('Indented title')
     expect(out.payload.slug).toBe('indented-slug')
   })
+
+  it('splits frontmatter from body via body: | sentinel', () => {
+    // When users put markdown body inside the yaml fence (which happens because
+    // GitHub's render:yaml wraps the whole field), the parser must split on
+    // the `body: |` sentinel and treat everything after as the markdown body.
+    const body = [
+      '```yaml',
+      'category: blog',
+      '  title: With body',
+      '  slug: with-body',
+      '  pubDate: 2026-06-14',
+      '  slugId: with-body',
+      '  body: |',
+      '  ## 这是正文',
+      '  正文内容',
+      '  - 列表项',
+      '```',
+    ].join('\n')
+    const out = parseIssueBody(body)
+    expect(out.payload.title).toBe('With body')
+    expect(out.payload.body).toContain('## 这是正文')
+    expect(out.payload.body).toContain('- 列表项')
+  })
 })
