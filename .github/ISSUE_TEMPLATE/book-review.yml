@@ -1,0 +1,23 @@
+name: 📖 书评 (book-review)
+description: 为已有的一本书添加书评
+labels: ["cms/auto"]
+body:
+  - type: textarea
+    id: yaml
+    attributes:
+      label: YAML 内容（注意 bookSlug 必须指向 src/content/books/ 下已存在的目录名）
+      placeholder: |
+        ```yaml
+        category: book-review
+        title: 评《乡土中国》
+        slug: review-xiangtu
+        pubDate: 2026-06-14
+        slugId: review-xiangtu
+        bookSlug: xiangtu-zhongguo
+        rating: recommended
+        tags: [书评, 社会学]
+        ```
+        ## 评论正文
+      render: yaml
+    validations:
+      required: true

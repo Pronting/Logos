@@ -1,0 +1,21 @@
+name: 🔗 好文 (article)
+description: 转载/收藏一篇外链好文
+labels: ["cms/auto"]
+body:
+  - type: textarea
+    id: yaml
+    attributes:
+      label: YAML 内容
+      placeholder: |
+        ```yaml
+        category: article
+        title: 转载的好文标题
+        slug: external-article-1
+        link: https://example.com/original-article
+        pubDate: 2026-06-14
+        description: 简要说明
+        tags: [好文]
+        ```
+      render: yaml
+    validations:
+      required: true

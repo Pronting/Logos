@@ -1,0 +1,26 @@
+name: 📚 书籍 (book)
+description: 添加一本书的元信息
+labels: ["cms/auto"]
+body:
+  - type: textarea
+    id: yaml
+    attributes:
+      label: YAML 内容
+      placeholder: |
+        ```yaml
+        category: book
+        title: 乡土中国
+        slug: xiangtu-zhongguo
+        author: 费孝通
+        cover: https://example.com/cover.jpg
+        tags: [社会学, 经典]
+        rating: recommended
+        summary: 一句话总结
+        briefComment: 我的短评……
+        readDate: 2025-01-15
+        year: 1947
+        ```
+        ## 长正文
+      render: yaml
+    validations:
+      required: true

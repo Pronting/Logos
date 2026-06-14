@@ -1,0 +1,20 @@
+name: 🗂 专栏 (column)
+description: 新建一个专栏
+labels: ["cms/auto"]
+body:
+  - type: textarea
+    id: yaml
+    attributes:
+      label: YAML 内容
+      placeholder: |
+        ```yaml
+        category: column
+        title: 我的专栏
+        slug: my-column
+        description: 专栏简介
+        icon: 📚
+        tags: [个人]
+        ```
+      render: yaml
+    validations:
+      required: true

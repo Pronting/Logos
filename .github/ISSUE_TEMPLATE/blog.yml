@@ -1,0 +1,29 @@
+name: 📝 博客文章 (blog)
+description: 发布一篇博客文章
+labels: ["cms/auto"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **填好后下面会渲染出一个 ```yaml 围栏块**，请**原样复制到 issue body**（包括围栏），
+        action 会读取这个 yaml 自动生成 `src/content/blog/<slug>/zh-cn.md`。
+  - type: textarea
+    id: yaml
+    attributes:
+      label: YAML 内容
+      placeholder: |
+        ```yaml
+        category: blog
+        title: 我的新文章标题
+        slug: my-new-post
+        pubDate: 2026-06-14
+        slugId: my-new-post
+        description: 一句话描述
+        tags: [教程, 解决方案]
+        image: title.png
+        draft: false
+        ```
+        ## 这里是正文
+      render: yaml
+    validations:
+      required: true
