@@ -53,6 +53,22 @@ function extractYamlBlock(body) {
   return m[1]
 }
 
+/**
+ * GitHub renders issue-form textareas with `render: yaml` by adding 2-space
+ * indent to every line AFTER the first. yaml 1.2 then sees the first un-indented
+ * line as a compact mapping and rejects subsequent indented lines as nested
+ * mappings ("Nested mappings are not allowed in compact mappings").
+ * Normalize by stripping leading whitespace from every non-empty line.
+ */
+function normalizeYamlIndent(text) {
+  const lines = text.split('\n')
+  // detect: first line has no leading whitespace, second line does
+  if (lines.length > 1 && lines[0].length > 0 && /^\s+\S/.test(lines[1])) {
+    return lines.map(l => l.replace(/^\s+/, '')).join('\n')
+  }
+  return text
+}
+
 function extractBodyAfterYaml(body) {
   const idx = body.indexOf('```', body.indexOf('```yaml'))
   if (idx === -1) return ''
@@ -60,7 +76,7 @@ function extractBodyAfterYaml(body) {
 }
 
 export function parseIssueBody(body) {
-  const yamlText = extractYamlBlock(body)
+  const yamlText = normalizeYamlIndent(extractYamlBlock(body))
   const obj = YAML.parse(yamlText)
   if (!obj || typeof obj !== 'object') {
     throw new Error('YAML block did not parse to an object')

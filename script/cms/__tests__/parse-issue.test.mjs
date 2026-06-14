@@ -45,4 +45,22 @@ describe('parseIssueBody', () => {
     ].join('\n')
     expect(() => parseIssueBody(body)).toThrow(/slug/i)
   })
+
+  it('normalizes GitHub render:yaml 2-space indent on lines after the first', () => {
+    // GitHub's issue-form `render: yaml` indents every line after the first
+    // by 2 spaces. yaml 1.2 then chokes with "Nested mappings are not allowed
+    // in compact mappings". The parser should strip the bogus indent.
+    const body = [
+      '```yaml',
+      'category: blog',
+      '  title: Indented title',
+      '  slug: indented-slug',
+      '  pubDate: 2026-06-14',
+      '  slugId: indented-slug',
+      '```',
+    ].join('\n')
+    const out = parseIssueBody(body)
+    expect(out.payload.title).toBe('Indented title')
+    expect(out.payload.slug).toBe('indented-slug')
+  })
 })
