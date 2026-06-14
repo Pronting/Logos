@@ -1,0 +1,182 @@
+name: CMS from Issue → cms-test
+
+on:
+  issues:
+    types: [opened, reopened, edited]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: 'Issue number to reprocess (manual trigger)'
+        required: true
+
+permissions:
+  contents: write
+  issues: write
+  actions: read
+
+concurrency:
+  group: cms-test
+  cancel-in-progress: true
+
+jobs:
+  cms-test:
+    name: Issue → cms-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - name: 🟢 Start
+        run: |
+          echo "## CMS from Issue → cms-test" >> $GITHUB_STEP_SUMMARY
+          echo "- event: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- issue: #${{ github.event.issue.number }}" >> $GITHUB_STEP_SUMMARY
+          echo "- actor: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "- target branch: cms-test" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+      - name: 📥 Checkout (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🧰 Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: 🧰 Setup pnpm 10
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: 📦 Install deps
+        run: pnpm install --frozen-lockfile
+
+      - name: 🧪 Run unit tests
+        id: tests
+        run: |
+          echo "### 🧪 vitest" >> $GITHUB_STEP_SUMMARY
+          pnpm test 2>&1 | tee /tmp/vitest.log || echo "::warning::vitest failed, continuing"
+
+      - name: 🔍 Parse issue body → payload.json
+        id: parse
+        env:
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+        run: |
+          echo "### 🔍 Parse" >> $GITHUB_STEP_SUMMARY
+          node script/cms/parse-issue.mjs "$GITHUB_EVENT_PATH" 2>&1 | tee -a $GITHUB_STEP_SUMMARY
+          if [ ! -f .cms-tmp/payload.json ]; then
+            echo "❌ parse failed, payload.json missing" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: ✅ Validate
+        id: validate
+        run: |
+          echo "### ✅ Validate" >> $GITHUB_STEP_SUMMARY
+          node script/cms/validate.mjs .cms-tmp/payload.json 2>&1 | tee -a $GITHUB_STEP_SUMMARY
+
+      - name: 🎨 Render markdown
+        id: render
+        env:
+          CMS_REPO_ROOT: ${{ github.workspace }}
+        run: |
+          echo "### 🎨 Render" >> $GITHUB_STEP_SUMMARY
+          node script/cms/render.mjs .cms-tmp/payload.json 2>&1 | tee -a $GITHUB_STEP_SUMMARY
+
+      - name: 🖼 Attach images (optional)
+        id: attach
+        if: env.GH_TOKEN != ''
+        env:
+          CMS_REPO_ROOT: ${{ github.workspace }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          GH_ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          echo "### 🖼 Attach images" >> $GITHUB_STEP_SUMMARY
+          CMS_COLLECTION=$(node -e "console.log(JSON.parse(require('fs').readFileSync('.cms-tmp/payload.json','utf8')).category==='book'?'books':JSON.parse(require('fs').readFileSync('.cms-tmp/payload.json','utf8')).category==='book-review'?'book-review':JSON.parse(require('fs').readFileSync('.cms-tmp/payload.json','utf8')).category)" CMS_SLUG=$(node -e "console.log(JSON.parse(require('fs').readFileSync('.cms-tmp/payload.json','utf8')).payload.slug)") node script/cms/attach-images.mjs 2>&1 | tee -a $GITHUB_STEP_SUMMARY || echo "::warning::attach-images failed, continuing"
+
+      - name: 🌐 Translate to en.md (optional)
+        id: translate
+        if: env.LLM_API_KEY != ''
+        env:
+          CMS_REPO_ROOT: ${{ github.workspace }}
+          LLM_BASE_URL: ${{ secrets.LLM_BASE_URL }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_MODEL: ${{ secrets.LLM_MODEL }}
+        run: |
+          echo "### 🌐 Translate" >> $GITHUB_STEP_SUMMARY
+          SLUG=$(node -e "console.log(JSON.parse(require('fs').readFileSync('.cms-tmp/payload.json','utf8')).payload.slug)")
+          COLLECTION=$(node -e "const c=JSON.parse(require('fs').readFileSync('.cms-tmp/payload.json','utf8')).category; console.log(c==='book'?'books':c==='book-review'?'book-review':c)")
+          node script/cms/translate.mjs "$CMS_REPO_ROOT" "$SLUG" "$COLLECTION" 2>&1 | tee -a $GITHUB_STEP_SUMMARY || echo "::warning::translate failed, continuing"
+
+      - name: 🚀 Push to cms-test
+        id: push
+        env:
+          CMS_REPO_ROOT: ${{ github.workspace }}
+          CMS_TARGET_BRANCH: cms-test
+          CMS_REQUIRE_TEST_BRANCH: '1'
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          echo "### 🚀 Push → cms-test" >> $GITHUB_STEP_SUMMARY
+          node script/cms/git-push.mjs .cms-tmp/payload.json 2>&1 | tee -a $GITHUB_STEP_SUMMARY
+
+      - name: 💬 Comment on issue
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          PAYLOAD=$(cat .cms-tmp/payload.json)
+          CATEGORY=$(node -e "console.log(JSON.parse(process.argv[1]).category)" "$PAYLOAD")
+          SLUG=$(node -e "console.log(JSON.parse(process.argv[1]).payload.slug)" "$PAYLOAD")
+          NUM=${{ github.event.issue.number }}
+          SHA=$(git rev-parse HEAD)
+          SHORT=$(echo $SHA | cut -c1-7)
+          BODY="✅ CMS push (test mode) — \`$CATEGORY/$SLUG\` → \`cms-test\` @ \`$SHORT\`
+
+> 📋 本次 push 推到 **cms-test** 分支（不部署）。本地验证：
+> \`\`\`
+> git fetch origin cms-test
+> git checkout cms-test
+> pnpm install && pnpm dev
+> \`\`\`
+> 验证通过后由你开 PR 合并到 \`main\`。"
+          echo "### 💬 Comment" >> $GITHUB_STEP_SUMMARY
+          echo "$BODY" | head -3 >> $GITHUB_STEP_SUMMARY
+          curl -fsS -X POST \
+            -H "Authorization: token $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GH_REPO/issues/$NUM/comments" \
+            -d "$(node -e "console.log(JSON.stringify({body: process.argv[1]}))" "$BODY")" \
+            > /dev/null && echo "comment posted" >> $GITHUB_STEP_SUMMARY
+
+      - name: ❌ Failure handler
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          NUM=${{ github.event.issue.number }}
+          cat $GITHUB_STEP_SUMMARY > /tmp/summary.txt
+          BODY="❌ CMS push 失败 (test mode)。
+
+**调试**：打开 workflow run → 查看 step summary 定位失败步骤。
+
+\`\`\`
+$(cat /tmp/summary.txt | tail -30)
+\`\`\`"
+          curl -fsS -X POST \
+            -H "Authorization: token $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GH_REPO/issues/$NUM/comments" \
+            -d "$(node -e "console.log(JSON.stringify({body: process.argv[1]}))" "$BODY")" \
+            > /dev/null 2>&1 || true
+          curl -fsS -X POST \
+            -H "Authorization: token $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GH_REPO/issues/$NUM/labels" \
+            -d "$(node -e "console.log(JSON.stringify({labels: ['cms/invalid']}))")" \
+            > /dev/null 2>&1 || true

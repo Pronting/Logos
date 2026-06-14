@@ -7,7 +7,9 @@
     "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
     "astro": "astro",
-    "newpost": "node script/newpost.js"
+    "newpost": "node script/newpost.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.12",
@@ -48,6 +50,11 @@
     "@iconify-json/fluent": "^1.2.45",
     "@iconify-json/material-symbols": "^1.2.35",
     "@iconify-json/simple-icons": "^1.2.48",
-    "@iconify-json/vscode-icons": "^1.2.29"
+    "@iconify-json/vscode-icons": "^1.2.29",
+    "@octokit/rest": "^22.0.1",
+    "fast-glob": "^3.3.3",
+    "vitest": "^4.1.8",
+    "yaml": "^2.9.0",
+    "zod": "^4.4.3"
   }
 }
