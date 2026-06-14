@@ -1,26 +1,84 @@
 ---
-import "@styles/global.css"
-import { heroConfig } from "@/config/hero"
+import "@styles/global.css";
+import { heroConfig } from "@/config/hero";
+import { getRelativeLocaleUrl } from "@utils/url-utils";
+import { i18n } from "astro:config/client";
 
-const { greeting, name, motto, tags } = heroConfig;
-// motto is now string[] — passed as JSON to data-mottos
+const locale = Astro.currentLocale ?? i18n!.defaultLocale;
+const {
+  greeting,
+  name,
+  motto,
+  tags,
+  quote,
+  quoteAuthor,
+  primaryCta,
+  secondaryCta,
+  particles,
+} = heroConfig;
+
+const primaryHref = getRelativeLocaleUrl(locale, primaryCta.href);
+const secondaryHref = getRelativeLocaleUrl(locale, secondaryCta.href);
+
+// 将每个汉字拆成独立 span，便于 stagger 入场
+function splitChars(s: string) {
+  return Array.from(s);
+}
+const greetingChars = splitChars(greeting);
+const nameChars = splitChars(name);
 ---
 
-<div
-    class="hero-section text-center pt-16 pb-8 max-w-[var(--page-width)] mx-auto md:mt-0 mt-24 px-4"
-    data-aos="fade-up"
-    data-aos-duration="800"
+<section
+    class="hero-section relative isolate flex min-h-[100dvh] w-full flex-col items-center justify-center overflow-hidden px-6 pt-24 pb-16"
+    aria-label="首页 Hero"
 >
-    <!-- 大字主标题 -->
-    <h1
-        class="text-[var(--text-color)] font-extrabold leading-tight tracking-tight mb-4"
-        style="font-size: clamp(2.5rem, 6vw, 5rem);"
+    <!-- 粒子背景 canvas：绝对定位、pointer-events-none、不阻塞交互 -->
+    <canvas
+        id="hero-particles"
+        class="absolute inset-0 -z-10 h-full w-full pointer-events-none"
+        aria-hidden="true"
+        data-count={particles.count}
+        data-speed={particles.speed}
+        data-color={particles.color}
+    ></canvas>
+
+    <!-- 顶部 eyebrow：标签用 middle-dot 间隔（taste-skill §4.7 EYEBROW RESTRAINT: hero 算 1 个） -->
+    <div
+        class="hero-eyebrow mb-6 text-[var(--text-color-70)] font-mono text-sm uppercase tracking-[0.18em]"
+        data-aos="fade-down"
+        data-aos-duration="600"
     >
-        {greeting} {name}
+        {tags.join(" · ")}
+    </div>
+
+    <!-- 大标题：两行 kinetic 字符入场 -->
+    <h1
+        class="hero-title font-extrabold tracking-tight leading-[1.05] text-center max-w-5xl text-[var(--text-color)]"
+        style="font-size: clamp(3rem, 9vw, 7rem);"
+    >
+        <span class="block mb-2 text-[var(--text-color-70)] font-semibold" style="font-size: clamp(1.25rem, 3vw, 2rem); letter-spacing: 0.04em;">
+            {greetingChars.map((ch, i) => (
+                <span class="char-stagger inline-block" style={`--i:${i};`}>{ch === " " ? " " : ch}</span>
+            ))}
+        </span>
+        <span class="block font-black">
+            {nameChars.map((ch, i) => (
+                <span
+                    class="char-stagger inline-block"
+                    style={`--i:${i + greetingChars.length};`}
+                >{ch}</span>
+            ))}
+        </span>
     </h1>
 
-    <!-- 座右铭：JS 打字机 -->
-    <p class="mb-6" style="font-size: clamp(1rem, 2.5vw, 1.5rem);">
+    <!-- 打字机 motto -->
+    <p
+        class="hero-motto mt-8 mb-2 text-center max-w-2xl"
+        style="font-size: clamp(1rem, 2.5vw, 1.5rem);"
+        data-aos="fade-up"
+        data-aos-delay="600"
+        data-aos-duration="700"
+    >
         <span
             id="hero-motto"
             class="text-[var(--text-color-70)]"
@@ -33,45 +91,149 @@ const { greeting, name, motto, tags } = heroConfig;
         ></span>
     </p>
 
-    <!-- 标签行 -->
-    <div class="flex flex-wrap justify-center gap-3" data-aos="fade-up" data-aos-delay="400">
-        {tags.map((tag) => (
-            <span
-                class="inline-block px-4 py-1.5 rounded-full text-sm font-medium
-                       bg-[var(--button-hover-color)] text-[var(--text-color-70)]
-                       border border-[var(--button-border-color)]
-                       hover:border-[var(--link-color)] hover:text-[var(--link-color)]
-                       transition-all duration-300"
+    <!-- quote -->
+    <blockquote
+        class="hero-quote mt-10 max-w-2xl text-center text-[var(--text-color-70)] italic"
+        style="font-size: clamp(0.95rem, 1.6vw, 1.125rem);"
+        data-aos="fade-up"
+        data-aos-delay="900"
+        data-aos-duration="700"
+    >
+        <span>{quote}</span>
+        {quoteAuthor && (
+            <div class="mt-2 not-italic text-[var(--text-color-70)] opacity-70" style="font-size: 0.85em;">
+                {quoteAuthor}
+            </div>
+        )}
+    </blockquote>
+
+    <!-- CTA 双按钮：primary 实心 + secondary 描边 -->
+    <div
+        class="hero-ctas mt-10 flex flex-wrap justify-center gap-4"
+        data-aos="fade-up"
+        data-aos-delay="1200"
+        data-aos-duration="700"
+    >
+        <a
+            href={primaryHref}
+            class="hero-cta-primary inline-flex items-center gap-2 rounded-full px-7 py-3 text-base font-semibold
+                   bg-[var(--text-color)] text-[var(--bg-color)]
+                   transition-all duration-300
+                   hover:opacity-90 hover:-translate-y-[1px]"
+        >
+            <span>{primaryCta.label}</span>
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16" height="16" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="1.5"
+                stroke-linecap="round" stroke-linejoin="round"
+                aria-hidden="true"
             >
-                {tag}
-            </span>
-        ))}
+                <path d="M5 12h14" />
+                <path d="m13 6 6 6-6 6" />
+            </svg>
+        </a>
+        <a
+            href={secondaryHref}
+            class="hero-cta-secondary inline-flex items-center rounded-full px-7 py-3 text-base font-medium
+                   border border-[var(--button-border-color)] text-[var(--text-color-70)]
+                   transition-all duration-300
+                   hover:border-[var(--link-color)] hover:text-[var(--link-color)] hover:-translate-y-[1px]"
+        >
+            <span>{secondaryCta.label}</span>
+        </a>
     </div>
-</div>
+
+    <!-- 滚动指示：底部居中，向下浮动 -->
+    <div
+        class="hero-scroll-cue absolute bottom-8 left-1/2 -translate-x-1/2 text-[var(--text-color-70)]"
+        data-aos="fade-in"
+        data-aos-delay="1600"
+        data-aos-duration="800"
+        aria-label="向下滚动查看更多"
+    >
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="22" height="22" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round"
+            aria-hidden="true"
+            class="scroll-arrow"
+        >
+            <path d="M12 5v14" />
+            <path d="m6 13 6 6 6-6" />
+        </svg>
+    </div>
+</section>
 
 <style>
     @keyframes blink {
         0%, 100% { opacity: 1; }
         50% { opacity: 0; }
     }
+
+    /* 字符 stagger 入场 */
+    .char-stagger {
+        opacity: 0;
+        transform: translateY(0.4em);
+        animation: char-rise 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        animation-delay: calc(var(--i, 0) * 60ms + 120ms);
+    }
+
+    @keyframes char-rise {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* 滚动指示浮动 */
+    .scroll-arrow {
+        animation: float-bob 1.8s ease-in-out infinite;
+    }
+
+    @keyframes float-bob {
+        0%, 100% { transform: translateY(0); opacity: 0.85; }
+        50%      { transform: translateY(6px); opacity: 1; }
+    }
+
+    /* 窄屏进一步压缩 */
+    @media (max-width: 640px) {
+        .hero-section {
+            padding-top: 6rem;
+            padding-bottom: 4rem;
+        }
+    }
+
+    /* prefers-reduced-motion：取消 stagger / 浮动，仅保留静态 */
+    @media (prefers-reduced-motion: reduce) {
+        .char-stagger {
+            opacity: 1;
+            transform: none;
+            animation: none;
+        }
+        .scroll-arrow {
+            animation: none;
+        }
+    }
 </style>
 
 <script>
     function runTypewriter() {
-        const el = document.getElementById('hero-motto');
-        const cursor = document.getElementById('hero-cursor');
+        const el = document.getElementById("hero-motto");
+        const cursor = document.getElementById("hero-cursor");
         if (!el || !cursor) return;
 
-        const mottos: string[] = JSON.parse(el.dataset.mottos || '[]');
+        const mottos: string[] = JSON.parse(el.dataset.mottos || "[]");
         if (mottos.length === 0) return;
 
-        el.textContent = '';
-        cursor.style.display = 'inline-block';
+        el.textContent = "";
+        cursor.style.display = "inline-block";
 
-        const TYPE_SPEED = 100;      // ms per character when typing
-        const BACK_SPEED = 50;       // ms per character when deleting
-        const PAUSE_AFTER_TYPE = 2000; // pause 2s after typing completes
-        const PAUSE_AFTER_DELETE = 300; // brief pause after deletion
+        const TYPE_SPEED = 100;
+        const BACK_SPEED = 50;
+        const PAUSE_AFTER_TYPE = 2000;
+        const PAUSE_AFTER_DELETE = 300;
 
         let mottoIndex = 0;
 
@@ -91,7 +253,7 @@ const { greeting, name, motto, tags } = heroConfig;
 
         function deleteText(onComplete: () => void) {
             function deleteNext() {
-                const current = el!.textContent || '';
+                const current = el!.textContent || "";
                 if (current.length > 0) {
                     el!.textContent = current.slice(0, -1);
                     setTimeout(deleteNext, BACK_SPEED);
@@ -112,9 +274,172 @@ const { greeting, name, motto, tags } = heroConfig;
             });
         }
 
-        // Small delay so the AOS fade-up settles first
-        setTimeout(loop, 600);
+        setTimeout(loop, 800);
     }
 
-    document.addEventListener('astro:page-load', runTypewriter);
+    // 粒子背景：单 Canvas，鼠标交互，prefers-reduced-motion 跳过循环
+    function runParticles() {
+        const canvas = document.getElementById("hero-particles") as HTMLCanvasElement | null;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        const ds = canvas.dataset;
+        const count = Number(ds.count) || 40;
+        const speed = Number(ds.speed) || 0.3;
+
+        const root = document.documentElement;
+        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+        let width = 0;
+        let height = 0;
+
+        type P = { x: number; y: number; vx: number; vy: number; r: number };
+        let particles: P[] = [];
+        let rafId = 0;
+        let mouseX = -9999;
+        let mouseY = -9999;
+        let lastMoveTime = 0;
+        let liveColor = "";
+
+        function readColor(): string {
+            return getComputedStyle(root).getPropertyValue("--text-color-70").trim() || "#4c4c4c";
+        }
+
+        function resize() {
+            const rect = canvas!.getBoundingClientRect();
+            width = rect.width;
+            height = rect.height;
+            canvas!.width = Math.floor(width * dpr);
+            canvas!.height = Math.floor(height * dpr);
+            ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
+            particles = Array.from({ length: count }, makeParticle);
+        }
+
+        function makeParticle(): P {
+            return {
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * speed,
+                vy: (Math.random() - 0.5) * speed,
+                r: 1 + Math.random() * 1.6,
+            };
+        }
+
+        function drawStatic() {
+            ctx!.clearRect(0, 0, width, height);
+            ctx!.fillStyle = liveColor;
+            ctx!.globalAlpha = 0.32;
+            for (const p of particles) {
+                ctx!.beginPath();
+                ctx!.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx!.fill();
+            }
+            ctx!.globalAlpha = 1;
+        }
+
+        function tick() {
+            liveColor = readColor();
+            ctx!.clearRect(0, 0, width, height);
+            ctx!.fillStyle = liveColor;
+            ctx!.globalAlpha = 0.45;
+
+            const now = performance.now();
+            const mouseActive = now - lastMoveTime < 1500;
+
+            for (const p of particles) {
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (mouseActive) {
+                    const dx = mouseX - p.x;
+                    const dy = mouseY - p.y;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist < 160 && dist > 0.01) {
+                        p.vx += (dx / dist) * 0.01;
+                        p.vy += (dy / dist) * 0.01;
+                    }
+                }
+
+                p.vx *= 0.985;
+                p.vy *= 0.985;
+
+                if (p.x < -10) p.x = width + 10;
+                if (p.x > width + 10) p.x = -10;
+                if (p.y < -10) p.y = height + 10;
+                if (p.y > height + 10) p.y = -10;
+
+                ctx!.beginPath();
+                ctx!.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx!.fill();
+            }
+
+            ctx!.globalAlpha = 0.15;
+            ctx!.strokeStyle = liveColor;
+            ctx!.lineWidth = 0.6;
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const a = particles[i];
+                    const b = particles[j];
+                    const dx = a.x - b.x;
+                    const dy = a.y - b.y;
+                    const d2 = dx * dx + dy * dy;
+                    if (d2 < 80 * 80) {
+                        ctx!.beginPath();
+                        ctx!.moveTo(a.x, a.y);
+                        ctx!.lineTo(b.x, b.y);
+                        ctx!.stroke();
+                    }
+                }
+            }
+
+            ctx!.globalAlpha = 1;
+            rafId = requestAnimationFrame(tick);
+        }
+
+        function onPointerMove(e: PointerEvent) {
+            const rect = canvas!.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+            mouseY = e.clientY - rect.top;
+            lastMoveTime = performance.now();
+        }
+
+        function onPointerLeave() {
+            mouseX = -9999;
+            mouseY = -9999;
+        }
+
+        liveColor = readColor();
+        resize();
+        window.addEventListener("resize", resize);
+        canvas.addEventListener("pointermove", onPointerMove);
+        canvas.addEventListener("pointerleave", onPointerLeave);
+
+        if (reduceMotion) {
+            drawStatic();
+        } else {
+            rafId = requestAnimationFrame(tick);
+        }
+
+        // 主题切换时，颜色 token 变化；下一帧自动用新值
+        const themeObserver = new MutationObserver(() => {
+            liveColor = readColor();
+            if (reduceMotion) drawStatic();
+        });
+        themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+        const cleanup = () => {
+            cancelAnimationFrame(rafId);
+            window.removeEventListener("resize", resize);
+            canvas.removeEventListener("pointermove", onPointerMove);
+            canvas.removeEventListener("pointerleave", onPointerLeave);
+            themeObserver.disconnect();
+        };
+        document.addEventListener("astro:before-swap", cleanup, { once: true });
+    }
+
+    document.addEventListener("astro:page-load", runTypewriter);
+    document.addEventListener("astro:page-load", runParticles);
 </script>
