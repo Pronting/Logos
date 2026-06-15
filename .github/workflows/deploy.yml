@@ -1,57 +1,115 @@
-name: Deploy to GitHub Pages
+name: Deploy to Server (Docker)
 
 on:
   push:
-    branches:
-      - main
-    # Review gh actions docs if you want to further define triggers, paths, etc
-    # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on
+    branches: [main]
+    paths:
+      - 'src/content/**'
+      - 'src/pages/**'
+      - 'src/components/**'
+      - 'src/i18n/**'
+      - 'src/config.ts'
+      - 'astro.config.mjs'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'Dockerfile'
+      - 'nginx.conf'
+      - 'public/**'
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+concurrency:
+  group: deploy-server
+  cancel-in-progress: false   # 排队而非取消，避免并发部署把 prev 覆盖错
 
 jobs:
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-          run_install: false
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-      
-      - name: Install dependencies
-        run: pnpm install
-      
-      - name: Build
-        run: pnpm build
-
-      - name: Upload
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: 'dist'
-  
   deploy:
-    needs: build
     runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    timeout-minutes: 15
     steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Deploy via SSH (blue-green + auto rollback)
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.DEPLOY_PORT || 22 }}
+          command_timeout: 12m
+          script: |
+            set -euo pipefail
+
+            DEPLOY_PATH="${{ secrets.DEPLOY_PATH }}"
+            HEALTH_URL="${{ secrets.DEPLOY_HEALTH_URL || 'http://localhost:9090/' }}"
+            IMAGE_NAME="logos-app"
+            CONTAINER_NAME="logos-app"
+            HOST_PORT=9090
+
+            cd "$DEPLOY_PATH"
+
+            echo "===== 1. 拉取最新代码 ====="
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "===== 2. 备份当前镜像为 ${IMAGE_NAME}:prev ====="
+            if docker inspect "$IMAGE_NAME:latest" >/dev/null 2>&1; then
+              docker tag "$IMAGE_NAME:latest" "$IMAGE_NAME:prev" || true
+              echo "  -> 已将现有 ${IMAGE_NAME}:latest 标记为 ${IMAGE_NAME}:prev"
+            else
+              echo "  -> 首次部署，无 prev 可备份"
+            fi
+
+            echo "===== 3. 安装依赖并构建 ====="
+            if ! command -v pnpm >/dev/null 2>&1; then
+              echo ">>> 安装 pnpm (Ubuntu 22.04 默认无 corepack/pnpm)"
+              if command -v corepack >/dev/null 2>&1; then
+                corepack enable || sudo corepack enable
+                corepack prepare pnpm@10 --activate
+              else
+                echo "❌ corepack 不存在，且 pnpm 也不存在，请先在服务器上安装 Node.js + corepack" >&2
+                exit 1
+              fi
+            fi
+            pnpm install --frozen-lockfile
+            pnpm build
+
+            echo "===== 4. 构建新镜像 ====="
+            TIMESTAMP=$(date +%Y%m%d%H%M%S)
+            docker build -t "$IMAGE_NAME:new" -t "$IMAGE_NAME:$TIMESTAMP" .
+
+            echo "===== 5. 切流（蓝绿） ====="
+            docker stop "$CONTAINER_NAME" || true
+            docker rm   "$CONTAINER_NAME" || true
+            docker run -d \
+              --name "$CONTAINER_NAME" \
+              -p "$HOST_PORT:80" \
+              --restart unless-stopped \
+              --label commit=$(git rev-parse HEAD) \
+              --label deployed_at=$(date -Iseconds) \
+              "$IMAGE_NAME:new"
+
+            echo "===== 6. 健康检查（最多 30s） ====="
+            for i in 1 2 3 4 5 6; do
+              if curl -fsS "$HEALTH_URL" >/dev/null 2>&1; then
+                echo "✅ health check passed on try $i"
+                docker tag "$IMAGE_NAME:new" "$IMAGE_NAME:latest"
+                echo "===== 部署成功 ====="
+                echo "  image  = ${IMAGE_NAME}:latest (=${IMAGE_NAME}:new)"
+                echo "  commit = $(git rev-parse HEAD)"
+                exit 0
+              fi
+              echo "  retry $i failed, sleeping 5s..."
+              sleep 5
+            done
+
+            echo "===== ❌ health check failed, rolling back to ${IMAGE_NAME}:prev ====="
+            docker stop "$CONTAINER_NAME" || true
+            docker rm   "$CONTAINER_NAME" || true
+            if docker inspect "$IMAGE_NAME:prev" >/dev/null 2>&1; then
+              docker run -d \
+                --name "$CONTAINER_NAME" \
+                -p "$HOST_PORT:80" \
+                --restart unless-stopped \
+                "$IMAGE_NAME:prev"
+              echo "✅ rolled back to ${IMAGE_NAME}:prev"
+            else
+              echo "❌ ${IMAGE_NAME}:prev 不存在，无法回滚！容器已停止，请人工介入。" >&2
+            fi
+            exit 1
