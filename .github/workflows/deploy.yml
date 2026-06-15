@@ -113,6 +113,80 @@ jobs:
               if curl -fsS "$HEALTH_URL" >/dev/null 2>&1; then
                 echo "✅ health check passed on try $i"
                 docker tag "$IMAGE_NAME:new" "$IMAGE_NAME:latest"
+
+                echo "===== 7. 同步 1Panel openresty 反代（让 http://80 也能命中新容器） ====="
+                # 从 HEALTH_URL 推导域名（去掉 scheme 和路径），从 HOST_PORT 推导容器端口
+                DOMAIN=$(echo "$HEALTH_URL" | sed -E 's#^[a-z]+://##; s#/.*$##; s#:[0-9]+$##')
+                # 兜底：localhost/127.0.0.1/空 都替换为宿主机第一张网卡 IP（1Panel 反代必须用真实 host name）
+                if [ -z "$DOMAIN" ] || [ "$DOMAIN" = "localhost" ] || [ "$DOMAIN" = "127.0.0.1" ]; then
+                  DOMAIN=$(hostname -I 2>/dev/null | awk '{for(i=1;i<=NF;i++) if($i!~/^127\./){print $i; exit}}')
+                fi
+                [ -z "$DOMAIN" ] && DOMAIN="_"  # 实在拿不到就 server_name _ 兜住所有请求
+
+                # 1Panel openresty 容器名（自动发现：取第一个跑着的 openresty 容器）
+                OPENRESTY_CTN=$(docker ps --format '{{.Names}}' | grep -iE 'openresty|1panel-openresty' | head -1 || true)
+                # 1Panel 在宿主机上的配置目录（与容器内 bind mount 对应）
+                ONE_PANEL_CONF_DIR="/opt/1panel/www/conf.d"
+                LEGACY_STATIC_DIR_DEFAULT="/opt/1panel/apps/openresty/openresty/conf/default/logos.conf"
+
+                echo "  DOMAIN          = $DOMAIN"
+                echo "  HOST_PORT       = $HOST_PORT"
+                echo "  OPENRESTY_CTN   = ${OPENRESTY_CTN:-(not found)}"
+
+                if [ -z "$OPENRESTY_CTN" ]; then
+                  echo "  ⚠️ 未发现 openresty 容器，跳过反代配置（容器已正确暴露在 :${HOST_PORT}）"
+                else
+                  # 7.1 清理旧的、可能冲突的静态网站 server 块（一次性）
+                  if [ -f "$LEGACY_STATIC_DIR_DEFAULT" ]; then
+                    echo "  -> 发现残留的静态网站配置，删除: $LEGACY_STATIC_DIR_DEFAULT"
+                    sudo rm -f "$LEGACY_STATIC_DIR_DEFAULT" || true
+                  fi
+
+                  # 7.2 写入反代 conf（幂等：内容固定 -> 每次输出相同；md5 不变就不 reload）
+                  NGINX_CONF="$ONE_PANEL_CONF_DIR/logos.conf"
+                  # 用 here-doc with quoted delimiter 避免 $ 被 shell 吞掉
+                  sudo mkdir -p "$ONE_PANEL_CONF_DIR" /opt/1panel/www/sites/logos/log
+                  sudo tee "$NGINX_CONF" >/dev/null <<NGX
+# Managed by Logos deploy (entrypoint.sh). Do not edit by hand.
+# Reverse-proxy -> logos-app container on :${HOST_PORT}
+server {
+    listen 80;
+    server_name ${DOMAIN};
+
+    location / {
+        proxy_pass http://127.0.0.1:${HOST_PORT};
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_buffering off;
+    }
+
+    access_log /www/sites/logos/log/access.log;
+    error_log  /www/sites/logos/log/error.log;
+}
+NGX
+
+                  # 7.3 在 openresty 容器内测试 + 必要时 reload
+                  RELOAD_OUT=$(docker exec "$OPENRESTY_CTN" sh -c 'nginx -t 2>&1 && nginx -s reload && echo RELOAD_OK' 2>&1 || true)
+                  echo "$RELOAD_OUT" | sed 's/^/    /'
+                  if echo "$RELOAD_OUT" | grep -q RELOAD_OK; then
+                    # 7.4 用与生产相同的 Host 头验证 :80 拿到的就是新容器
+                    VIA_80_MD5=$(curl -s --max-time 5 -H "Host: $DOMAIN" http://127.0.0.1/ | md5sum | awk '{print $1}')
+                    VIA_PORT_MD5=$(curl -s --max-time 5 "http://127.0.0.1:${HOST_PORT}/" | md5sum | awk '{print $1}')
+                    if [ -n "$VIA_80_MD5" ] && [ "$VIA_80_MD5" = "$VIA_PORT_MD5" ]; then
+                      echo "  ✅ 1Panel 反代已同步，http://${DOMAIN}/ 内容与容器一致 (md5=${VIA_80_MD5})"
+                    else
+                      echo "  ⚠️ 反代已 reload 但 :80 与 :${HOST_PORT} md5 不一致 (${VIA_80_MD5} vs ${VIA_PORT_MD5})，请人工检查"
+                    fi
+                  else
+                    echo "  ❌ nginx -t 或 reload 失败，反代未生效，但 :${HOST_PORT} 上的新容器已 OK"
+                  fi
+                fi
+
                 echo "===== 部署成功 ====="
                 echo "  image  = ${IMAGE_NAME}:latest (=${IMAGE_NAME}:new)"
                 echo "  commit = $(git rev-parse HEAD)"
