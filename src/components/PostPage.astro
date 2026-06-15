@@ -6,6 +6,7 @@ import type { CollectionEntry } from 'astro:content';
 const { page, urlPrefix = "/blog/" } = Astro.props;
 
 ---
+<div id="post-list-top" class="scroll-mt-24">
 {page.data.map((entry: CollectionEntry<"blog"> | CollectionEntry<"bookReview">) => (
         <PostCard
             entry={entry}
@@ -20,3 +21,4 @@ const { page, urlPrefix = "/blog/" } = Astro.props;
             urlPrefix={urlPrefix}>
         </PostCard>
 ))}
+</div>
