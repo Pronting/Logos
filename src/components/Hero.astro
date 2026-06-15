@@ -31,19 +31,17 @@ function splitChars(s: string) {
 const greetingChars = splitChars(greeting);
 const nameChars = splitChars(name);
 
-// 拆分 i18n 标签字符串为「前缀」「数字」「后缀」三段，
-// 让数字本身可以独立放大。
-// 例："共 {count} 篇文章" → prefix="共 ", suffix=" 篇文章"
-function splitLabel(template: string, value: number): { prefix: string; suffix: string } {
-  // 找到 {count} 第一次出现的位置
-  const m = template.match(/^(.*?)\{count\}(.*)$/);
-  if (!m) return { prefix: "", suffix: template };
-  // 数字本身用 toLocaleString 渲染（i18n 数字千分位）
-  // 这里只把字符串拆开，让模板里只渲染前后缀，数字单独用 toLocaleString
-  return { prefix: m[1], suffix: m[2] };
-}
-const articlesLabel = splitLabel(t("siteStats.articles", { count: String(articleCount) }), articleCount);
-const wordsLabel = splitLabel(t("siteStats.totalWords", { count: String(totalWords) }), totalWords);
+// Hero 第一行的统计句子：把数字当作主角，文字作为最小语法骨架。
+// 模板里用 {count} 和 {words} 两个占位符替代数字位置。
+// 渲染时再把这两个占位符替换成独立的 <span data-countup> 数字元素。
+// 例："累计 {count} 篇文章 {words} 个字"
+const statsTemplate = t("siteStats.heroSentence", { count: "__C__", words: "__W__" });
+// 拆成三段：[前缀+count段, 中间, 尾段]
+const splitIdx = statsTemplate.indexOf("__C__");
+const tailIdx = statsTemplate.indexOf("__W__");
+const head = statsTemplate.slice(0, splitIdx);
+const middle = statsTemplate.slice(splitIdx + "__C__".length, tailIdx);
+const tail = statsTemplate.slice(tailIdx + "__W__".length);
 ---
 
 <section
@@ -109,37 +107,29 @@ const wordsLabel = splitLabel(t("siteStats.totalWords", { count: String(totalWor
         ></span>
     </p>
 
-    <!-- 全站统计：两组合计数字 -->
-    <div
-        class="hero-stats mt-10 flex flex-wrap justify-center items-baseline gap-x-8 gap-y-3 text-center"
+    <!-- 全站统计：一句话，数字为主角 -->
+    <p
+        class="hero-stats mt-10 text-center text-[var(--text-color-70)]"
+        style="font-size: clamp(1rem, 1.8vw, 1.2rem);"
         data-aos="fade-up"
         data-aos-delay="900"
         data-aos-duration="700"
         aria-label="网站统计"
     >
-        <div class="stat flex items-baseline">
-            {articlesLabel.prefix && (
-                <span class="stat-prefix text-[var(--text-color-70)]" style="font-size: 0.95rem;">{articlesLabel.prefix}</span>
-            )}
-            <span
-                class="stat-num font-extrabold text-[var(--text-color)]"
-                style="font-size: clamp(1.75rem, 4vw, 2.75rem); font-variant-numeric: tabular-nums; line-height: 1;"
-                data-countup={String(articleCount)}
-            >0</span>
-            <span class="stat-suffix ml-1 text-[var(--text-color-70)]" style="font-size: 0.95rem;">{articlesLabel.suffix}</span>
-        </div>
-        <div class="stat flex items-baseline">
-            {wordsLabel.prefix && (
-                <span class="stat-prefix text-[var(--text-color-70)]" style="font-size: 0.95rem;">{wordsLabel.prefix}</span>
-            )}
-            <span
-                class="stat-num font-extrabold text-[var(--text-color)]"
-                style="font-size: clamp(1.75rem, 4vw, 2.75rem); font-variant-numeric: tabular-nums; line-height: 1;"
-                data-countup={String(totalWords)}
-            >0</span>
-            <span class="stat-suffix ml-1 text-[var(--text-color-70)]" style="font-size: 0.95rem;">{wordsLabel.suffix}</span>
-        </div>
-    </div>
+        {head}
+        <span
+            class="stat-num font-extrabold text-[var(--text-color)]"
+            style="font-size: clamp(1.75rem, 4vw, 2.75rem); font-variant-numeric: tabular-nums; line-height: 1;"
+            data-countup={String(articleCount)}
+        >0</span>
+        {middle}
+        <span
+            class="stat-num font-extrabold text-[var(--text-color)]"
+            style="font-size: clamp(1.75rem, 4vw, 2.75rem); font-variant-numeric: tabular-nums; line-height: 1;"
+            data-countup={String(totalWords)}
+        >0</span>
+        {tail}
+    </p>
 
     <!-- CTA 双按钮：primary 实心 + secondary 描边 -->
     <div

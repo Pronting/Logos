@@ -176,7 +176,7 @@ const translation: Translation = {
     },
     siteStats: {
         articles: "共 {count} 篇文章",
-        totalWords: "全站共 {count} 个字",
+        heroSentence: "累计 {count} 篇文章 {words} 个字",
         runningDays: "已运行 {days} 天",
         runningYears: "已运行 {years} 年 {days} 天",
     },

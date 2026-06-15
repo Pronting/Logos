@@ -176,7 +176,7 @@ const translation: Translation = {
     },
     siteStats: {
         articles: "{count} articles in total",
-        totalWords: "{count} words in total",
+        heroSentence: "{count} articles, {words} words so far",
         runningDays: "Running for {days} days",
         runningYears: "Running for {years} years {days} days",
     },
