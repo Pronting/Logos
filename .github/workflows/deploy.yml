@@ -75,16 +75,21 @@ jobs:
             fi
 
             echo "===== 3. 安装依赖并构建 ====="
+            # 严格前置检查：要求 pnpm + node 已就绪。
+            # 不在 CD 里装 Node —— 服务器环境配置是一次性的人工操作。
             if ! command -v pnpm >/dev/null 2>&1; then
-              echo ">>> 安装 pnpm (Ubuntu 22.04 默认无 corepack/pnpm)"
-              if command -v corepack >/dev/null 2>&1; then
-                corepack enable || sudo corepack enable
-                corepack prepare pnpm@10 --activate
-              else
-                echo "❌ corepack 不存在，且 pnpm 也不存在，请先在服务器上安装 Node.js + corepack" >&2
-                exit 1
-              fi
+              echo "❌ pnpm 不存在。请先在服务器上一次性安装：" >&2
+              echo "    curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -" >&2
+              echo "    sudo apt install -y nodejs" >&2
+              echo "    sudo corepack enable && corepack prepare pnpm@10 --activate" >&2
+              echo "    pnpm --version   # 验证" >&2
+              exit 1
             fi
+            if ! command -v node >/dev/null 2>&1; then
+              echo "❌ node 不存在（pnpm 装了但 node 缺？）" >&2
+              exit 1
+            fi
+            echo "  pnpm = $(pnpm --version), node = $(node --version)"
             pnpm install --frozen-lockfile
             pnpm build
 
