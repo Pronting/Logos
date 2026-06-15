@@ -2,16 +2,17 @@
 import "@styles/global.css";
 import { heroConfig } from "@/config/hero";
 import { getRelativeLocaleUrl } from "@utils/url-utils";
+import { getSiteTotals } from "@utils/content-utils";
 import { i18n } from "astro:config/client";
+import i18nit from "@i18n/translation";
 
 const locale = Astro.currentLocale ?? i18n!.defaultLocale;
+const t = i18nit(locale);
 const {
   greeting,
   name,
   motto,
   tags,
-  quote,
-  quoteAuthor,
   primaryCta,
   secondaryCta,
   particles,
@@ -20,12 +21,29 @@ const {
 const primaryHref = getRelativeLocaleUrl(locale, primaryCta.href);
 const secondaryHref = getRelativeLocaleUrl(locale, secondaryCta.href);
 
+// Hero 第一屏的全站统计：构建时聚合，无需手维护
+const { articleCount, totalWords } = await getSiteTotals(locale);
+
 // 将每个汉字拆成独立 span，便于 stagger 入场
 function splitChars(s: string) {
   return Array.from(s);
 }
 const greetingChars = splitChars(greeting);
 const nameChars = splitChars(name);
+
+// 拆分 i18n 标签字符串为「前缀」「数字」「后缀」三段，
+// 让数字本身可以独立放大。
+// 例："共 {count} 篇文章" → prefix="共 ", suffix=" 篇文章"
+function splitLabel(template: string, value: number): { prefix: string; suffix: string } {
+  // 找到 {count} 第一次出现的位置
+  const m = template.match(/^(.*?)\{count\}(.*)$/);
+  if (!m) return { prefix: "", suffix: template };
+  // 数字本身用 toLocaleString 渲染（i18n 数字千分位）
+  // 这里只把字符串拆开，让模板里只渲染前后缀，数字单独用 toLocaleString
+  return { prefix: m[1], suffix: m[2] };
+}
+const articlesLabel = splitLabel(t("siteStats.articles", { count: String(articleCount) }), articleCount);
+const wordsLabel = splitLabel(t("siteStats.totalWords", { count: String(totalWords) }), totalWords);
 ---
 
 <section
@@ -91,21 +109,37 @@ const nameChars = splitChars(name);
         ></span>
     </p>
 
-    <!-- quote -->
-    <blockquote
-        class="hero-quote mt-10 max-w-2xl text-center text-[var(--text-color-70)] italic"
-        style="font-size: clamp(0.95rem, 1.6vw, 1.125rem);"
+    <!-- 全站统计：两组合计数字 -->
+    <div
+        class="hero-stats mt-10 flex flex-wrap justify-center items-baseline gap-x-8 gap-y-3 text-center"
         data-aos="fade-up"
         data-aos-delay="900"
         data-aos-duration="700"
+        aria-label="网站统计"
     >
-        <span>{quote}</span>
-        {quoteAuthor && (
-            <div class="mt-2 not-italic text-[var(--text-color-70)] opacity-70" style="font-size: 0.85em;">
-                {quoteAuthor}
-            </div>
-        )}
-    </blockquote>
+        <div class="stat flex items-baseline">
+            {articlesLabel.prefix && (
+                <span class="stat-prefix text-[var(--text-color-70)]" style="font-size: 0.95rem;">{articlesLabel.prefix}</span>
+            )}
+            <span
+                class="stat-num font-extrabold text-[var(--text-color)]"
+                style="font-size: clamp(1.75rem, 4vw, 2.75rem); font-variant-numeric: tabular-nums; line-height: 1;"
+                data-countup={String(articleCount)}
+            >0</span>
+            <span class="stat-suffix ml-1 text-[var(--text-color-70)]" style="font-size: 0.95rem;">{articlesLabel.suffix}</span>
+        </div>
+        <div class="stat flex items-baseline">
+            {wordsLabel.prefix && (
+                <span class="stat-prefix text-[var(--text-color-70)]" style="font-size: 0.95rem;">{wordsLabel.prefix}</span>
+            )}
+            <span
+                class="stat-num font-extrabold text-[var(--text-color)]"
+                style="font-size: clamp(1.75rem, 4vw, 2.75rem); font-variant-numeric: tabular-nums; line-height: 1;"
+                data-countup={String(totalWords)}
+            >0</span>
+            <span class="stat-suffix ml-1 text-[var(--text-color-70)]" style="font-size: 0.95rem;">{wordsLabel.suffix}</span>
+        </div>
+    </div>
 
     <!-- CTA 双按钮：primary 实心 + secondary 描边 -->
     <div
@@ -481,4 +515,50 @@ const nameChars = splitChars(name);
 
     document.addEventListener("astro:page-load", runTypewriter);
     document.addEventListener("astro:page-load", runParticles);
+
+    // 数字 count-up：进入视口后从 0 平滑过渡到目标值
+    function runCountUp() {
+        const els = document.querySelectorAll<HTMLElement>("[data-countup]");
+        if (els.length === 0) return;
+
+        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const DURATION = 1200;
+
+        const animate = (el: HTMLElement) => {
+            const target = Number(el.dataset.countup) || 0;
+            if (reduceMotion) {
+                el.textContent = target.toLocaleString();
+                return;
+            }
+            const start = performance.now();
+            const tick = (now: number) => {
+                const t = Math.min(1, (now - start) / DURATION);
+                const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+                el.textContent = Math.floor(target * eased).toLocaleString();
+                if (t < 1) {
+                    requestAnimationFrame(tick);
+                } else {
+                    el.textContent = target.toLocaleString();
+                }
+            };
+            requestAnimationFrame(tick);
+        };
+
+        const io = new IntersectionObserver(
+            (entries) => {
+                for (const entry of entries) {
+                    if (entry.isIntersecting) {
+                        animate(entry.target as HTMLElement);
+                        io.unobserve(entry.target);
+                    }
+                }
+            },
+            { threshold: 0.4 }
+        );
+        els.forEach((el) => io.observe(el));
+
+        const cleanup = () => io.disconnect();
+        document.addEventListener("astro:before-swap", cleanup, { once: true });
+    }
+    document.addEventListener("astro:page-load", runCountUp);
 </script>

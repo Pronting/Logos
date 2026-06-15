@@ -174,6 +174,7 @@ export interface Translation {
     },
     siteStats: {
         articles: string;
+        totalWords: string;
         runningDays: string;
         runningYears: string;
     },

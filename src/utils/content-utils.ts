@@ -196,3 +196,40 @@ export async function getContributionData(lang: string): Promise<ContributionDay
   result.sort((a, b) => a.date.localeCompare(b.date));
   return result;
 }
+
+/**
+ * 汇总全站文章数量与字数，用于 Hero 区域数字展示。
+ * 聚合四个集合（blog / articles / columnArticles / bookReview）。
+ * 字数：直接对每条 entry 的原始 markdown `body` 跑 `reading-time`，
+ * 避免依赖 `render()` 阶段才挂载的 `remarkPluginFrontmatter` 字段。
+ * 各集合内部已自行处理 locale fallback，本函数只做合并。
+ */
+export interface SiteTotals {
+  articleCount: number;
+  totalWords: number;
+}
+
+export async function getSiteTotals(lang: string): Promise<SiteTotals> {
+  const { getBookReviews } = await import('@utils/book-utils');
+  const { getAllColumnArticles } = await import('@utils/column-utils');
+  const getReadingTime = (await import('reading-time')).default;
+
+  const [blogEntries, articles, columnArticles, bookReviews] = await Promise.all([
+    getBlogEntrySort(lang),
+    getArticles(lang),
+    getAllColumnArticles(lang).catch(
+      () => [] as { body?: string }[]
+    ),
+    getBookReviews(lang),
+  ]);
+
+  const all = [...blogEntries, ...articles, ...columnArticles, ...bookReviews];
+  const articleCount = all.length;
+  const totalWords = all.reduce((sum, entry) => {
+    const body = (entry as { body?: string }).body ?? "";
+    if (!body) return sum;
+    return sum + (getReadingTime(body).words ?? 0);
+  }, 0);
+
+  return { articleCount, totalWords };
+}
