@@ -107,7 +107,7 @@ const bookshelfUrl = entry.data.bookSlug
                 </div>
             )}
         </div>
-        {image && (
+        {image && entry.data.showCover !== false && (
             <div class="cover overflow-hidden mb-6 mt-10">
                 <ImageModule src={image} class="w-full h-full object-cover"/>
             </div>

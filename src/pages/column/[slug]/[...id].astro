@@ -96,7 +96,7 @@ const { remarkPluginFrontmatter } = await render(article);
             </div>
         </div>
 
-        {image && (
+        {image && article.data.showCover !== false && (
             <div class="cover overflow-hidden">
                 <ImageModule src={image} class="w-full h-full object-cover"/>
             </div>
