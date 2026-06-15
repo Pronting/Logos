@@ -42,6 +42,24 @@ jobs:
             CONTAINER_NAME="logos-app"
             HOST_PORT=9090
 
+            echo "===== 0. 诊断信息 ====="
+            echo "  whoami    = $(whoami)"
+            echo "  HOME      = $HOME"
+            echo "  DEPLOY_PATH='$DEPLOY_PATH'"
+            if [ -z "$DEPLOY_PATH" ]; then
+              echo "❌ DEPLOY_PATH Secret 未配置或为空！请在 GitHub repo Settings → Secrets 中添加 DEPLOY_PATH" >&2
+              exit 1
+            fi
+            if [ ! -d "$DEPLOY_PATH" ]; then
+              echo "❌ DEPLOY_PATH=$DEPLOY_PATH 在服务器上不存在！请先 SSH 到服务器手动 git clone 项目到此目录" >&2
+              exit 1
+            fi
+            if [ ! -d "$DEPLOY_PATH/.git" ]; then
+              echo "❌ DEPLOY_PATH=$DEPLOY_PATH 存在但不是 git 仓库（无 .git 目录）。请先 cd $DEPLOY_PATH && git clone <repo> ." >&2
+              exit 1
+            fi
+            echo "  ✅ DEPLOY_PATH 验证通过（含 .git 目录）"
+
             cd "$DEPLOY_PATH"
 
             echo "===== 1. 拉取最新代码 ====="
