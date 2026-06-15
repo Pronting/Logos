@@ -3,7 +3,7 @@ title: 一个比较有潜力的 Agent 项目 —— Agent-Sentinel
 pubDate: 2026-06-15
 description: 除了 vibe coding,如何用AI为开发任务真实提效并落地,这就是这个 agent 项目干的事
 tags: [工程, agent]
-cover: "https://pront-base-1318237185.cos.ap-guangzhou.myqcloud.com/20260611151537657.png"
+cover: "https://pront-base-1318237185.cos.ap-guangzhou.myqcloud.com/20260615105942908.png"
 draft: false
 showCover: false
 slugId: agent/1
@@ -32,7 +32,7 @@ slugId: agent/1
 (那种在十几个 Tab 之间反复横跳,一边查 traceid、一边翻日志、一边看指标的体验,相信做过 SRE 的人都懂 hhh。)
 
 
-# 现有模块一览
+## 现有模块一览
 | 模块       | 选型                                                                                                                          | 理由                                 |
 | -------- | --------------------------------------------------------------------------------------------------------------------------- |------------------------------------|
 | Agent 编排 | LangGraph                                                                                                                   | 节点可观测、扩展性强、支持并行分支                  |

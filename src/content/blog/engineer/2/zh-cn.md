@@ -20,7 +20,7 @@ slugId: engineer/2
 ## 一、为什么 DTC 出海绕不开 B2B
 
 **_解释一下什么叫做DTC: DTC(Direct to Consumer), 指的是直接面向消费者的生产模式_**
-
+![img](https://pront-base-1318237185.cos.ap-guangzhou.myqcloud.com/20260614105510449.png)
 
 在跨境电商领域，B2C 是最被津津乐道的模式。但真正把一个品牌"种"进一个新市场，往往绕不开 B2B——甚至 B2B2C。
 
