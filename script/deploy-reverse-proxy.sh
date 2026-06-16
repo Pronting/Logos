@@ -1,0 +1,171 @@
+#!/usr/bin/env bash
+# Logos deploy — sync 1Panel openresty reverse proxy (HTTP + HTTPS).
+#
+# What this does (idempotent, safe to re-run on every deploy):
+#   1. Delete legacy 1Panel "static site" conf that shadows port 80
+#   2. Pull latest cert + private key from 1Panel agent.db -> /opt/1panel/www/sites/logos/ssl/
+#   3. Warn (do NOT fail) if cert expires within 30 days
+#   4. Render /opt/1panel/www/conf.d/logos.conf with HTTP 301->HTTPS + HTTPS reverse-proxy
+#   5. nginx -t + reload inside the openresty container
+#   6. Verify HTTP->HTTPS redirect and HTTPS content matches container
+
+set -uo pipefail
+
+# ---------- Inputs (set by caller, normally from deploy.yml env / secrets) ----------
+DOMAIN="${PUBLIC_DOMAIN:-${1:-}}"
+HEALTH_URL="${DEPLOY_HEALTH_URL:-http://localhost:9090/}"
+HOST_PORT="${DEPLOY_HOST_PORT:-9090}"
+
+# ---------- 0. Domain resolution ----------
+if [ -z "$DOMAIN" ]; then
+  DOMAIN=$(echo "$HEALTH_URL" | sed -E 's#^[a-z]+://##; s#/.*$##; s#:[0-9]+$##')
+fi
+if [ -z "$DOMAIN" ] || [ "$DOMAIN" = "localhost" ] || [ "$DOMAIN" = "127.0.0.1" ]; then
+  DOMAIN=$(hostname -I 2>/dev/null | awk '{for(i=1;i<=NF;i++) if($i!~/^127\./){print $i; exit}}')
+fi
+[ -z "$DOMAIN" ] && DOMAIN="_"
+
+# Build server_name list: <domain> + www.<domain> (skip www prefix if already there)
+if [ "$DOMAIN" = "_" ] || ! echo "$DOMAIN" | grep -q '\.'; then
+  SERVER_NAMES="$DOMAIN"
+elif echo "$DOMAIN" | grep -q '^www\.'; then
+  SERVER_NAMES="$DOMAIN ${DOMAIN#www.}"
+else
+  SERVER_NAMES="$DOMAIN www.${DOMAIN}"
+fi
+
+echo "===== 7. 同步 1Panel openresty 反代 ====="
+echo "  DOMAIN        = $DOMAIN"
+echo "  SERVER_NAMES  = $SERVER_NAMES"
+echo "  HOST_PORT     = $HOST_PORT"
+
+# ---------- 1. Find openresty container ----------
+OPENRESTY_CTN=$(docker ps --format '{{.Names}}' | grep -iE 'openresty|1panel-openresty' | head -1 || true)
+echo "  OPENRESTY_CTN = ${OPENRESTY_CTN:-(not found)}"
+if [ -z "$OPENRESTY_CTN" ]; then
+  echo "  ⚠️ 未发现 openresty 容器，跳过（容器仍正确暴露在 :${HOST_PORT}）"
+  exit 0
+fi
+
+CONF_DIR="/opt/1panel/www/conf.d"
+LEGACY_STATIC="/opt/1panel/apps/openresty/openresty/conf/default/logos.conf"
+SSL_DIR="/opt/1panel/www/sites/logos/ssl"
+CERT_PATH="${SSL_DIR}/cert.pem"
+KEY_PATH="${SSL_DIR}/privkey.pem"
+NGINX_CONF="${CONF_DIR}/logos.conf"
+
+# ---------- 2. Delete legacy 1Panel static-site conf (idempotent) ----------
+if [ -f "$LEGACY_STATIC" ]; then
+  echo "  -> 删除残留静态网站配置: $LEGACY_STATIC"
+  sudo rm -f "$LEGACY_STATIC" || true
+fi
+
+# ---------- 3. Pull latest cert from 1Panel agent.db (if available) ----------
+sudo mkdir -p "$SSL_DIR" 2>/dev/null || true
+if [ -f /opt/1panel/db/agent.db ] && command -v sqlite3 >/dev/null 2>&1; then
+  # Match the SSL record whose primary_domain is our domain (or starts with it)
+  PEM_ROW=$(sudo sqlite3 /opt/1panel/db/agent.db "SELECT pem FROM website_ssls WHERE primary_domain LIKE '${DOMAIN}%' OR domains LIKE '%${DOMAIN}%' ORDER BY id DESC LIMIT 1;" 2>/dev/null || true)
+  KEY_ROW=$(sudo sqlite3 /opt/1panel/db/agent.db "SELECT private_key FROM website_ssls WHERE primary_domain LIKE '${DOMAIN}%' OR domains LIKE '%${DOMAIN}%' ORDER BY id DESC LIMIT 1;" 2>/dev/null || true)
+  if [ -n "$PEM_ROW" ] && [ -n "$KEY_ROW" ]; then
+    printf '%s' "$PEM_ROW" | sudo tee "$CERT_PATH" >/dev/null
+    printf '%s' "$KEY_ROW" | sudo tee "$KEY_PATH"  >/dev/null
+    sudo chmod 644 "$CERT_PATH" 2>/dev/null || true
+    sudo chmod 600 "$KEY_PATH"  2>/dev/null || true
+    sudo chown root:root "$CERT_PATH" "$KEY_PATH" 2>/dev/null || true
+    echo "  cert          = 已从 1Panel DB 同步 (primary_domain~=${DOMAIN})"
+  else
+    echo "  cert          = 1Panel DB 未找到匹配 ${DOMAIN} 的证书，沿用现有 $CERT_PATH"
+  fi
+else
+  echo "  cert          = 跳过 DB 同步 (无 sqlite3 或 agent.db)，沿用现有 $CERT_PATH"
+fi
+
+# ---------- 4. Cert expiry warning (do NOT fail) ----------
+if [ -f "$CERT_PATH" ] && command -v openssl >/dev/null 2>&1; then
+  CERT_NOT_AFTER=$(openssl x509 -in "$CERT_PATH" -noout -enddate 2>/dev/null | cut -d= -f2 || true)
+  if [ -n "$CERT_NOT_AFTER" ]; then
+    CERT_EXPIRE_EPOCH=$(date -d "$CERT_NOT_AFTER" +%s 2>/dev/null || echo 0)
+    NOW_EPOCH=$(date +%s)
+    if [ "$CERT_EXPIRE_EPOCH" -gt 0 ]; then
+      DAYS_LEFT=$(( (CERT_EXPIRE_EPOCH - NOW_EPOCH) / 86400 ))
+      echo "  cert expires  = $CERT_NOT_AFTER (${DAYS_LEFT} days left)"
+      if [ "$DAYS_LEFT" -lt 30 ] && [ "$DAYS_LEFT" -gt -1 ]; then
+        echo ""
+        echo "  ❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗"
+        echo "  ❗  证书将在 ${DAYS_LEFT} 天后过期"
+        echo "  ❗  请到 1Panel → 证书 → 上传新证书替换 ${DOMAIN} 的证书"
+        echo "  ❗  本脚本下次 deploy 会自动拉取新证书到 ${CERT_PATH}"
+        echo "  ❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗"
+        echo ""
+      fi
+    fi
+  fi
+fi
+
+# ---------- 5. Render reverse-proxy conf (HTTP 301 -> HTTPS + HTTPS) ----------
+sudo mkdir -p "$CONF_DIR" /opt/1panel/www/sites/logos/log 2>/dev/null || true
+
+sudo tee "$NGINX_CONF" >/dev/null <<NGX
+# Managed by Logos deploy. Do not edit by hand.
+# Regenerated by script/deploy-reverse-proxy.sh on every deploy.
+# Reverse-proxy -> logos-app container on :${HOST_PORT}
+# Cert synced from 1Panel agent.db -> ${CERT_PATH}
+
+# HTTP -> HTTPS
+server {
+    listen 80;
+    server_name ${SERVER_NAMES};
+    return 301 https://\$host\$request_uri;
+}
+
+# HTTPS reverse proxy
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name ${SERVER_NAMES};
+
+    ssl_certificate     ${CERT_PATH};
+    ssl_certificate_key ${KEY_PATH};
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
+    ssl_session_cache   shared:SSL:10m;
+    ssl_session_timeout 1d;
+
+    location / {
+        proxy_pass http://127.0.0.1:${HOST_PORT};
+        proxy_set_header Host              \$host;
+        proxy_set_header X-Real-IP         \$remote_addr;
+        proxy_set_header X-Forwarded-For   \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade           \$http_upgrade;
+        proxy_set_header Connection        "upgrade";
+        proxy_buffering off;
+    }
+
+    access_log /www/sites/logos/log/access.log;
+    error_log  /www/sites/logos/log/error.log;
+}
+NGX
+
+# ---------- 6. nginx -t + reload ----------
+RELOAD_OUT=$(docker exec "$OPENRESTY_CTN" sh -c 'nginx -t 2>&1 && nginx -s reload && echo RELOAD_OK' 2>&1 || true)
+echo "$RELOAD_OUT" | sed 's/^/    /'
+if ! echo "$RELOAD_OUT" | grep -q RELOAD_OK; then
+  echo "  ❌ nginx -t 或 reload 失败"
+  exit 0  # never fail the deploy because of proxy sync issues
+fi
+
+# ---------- 7. End-to-end verify ----------
+VIA_HTTP=$(curl -s --max-time 5 -H "Host: $DOMAIN" http://127.0.0.1/ | md5sum | awk '{print $1}')
+VIA_HTTPS=$(curl -sk --max-time 5 -H "Host: $DOMAIN" "https://127.0.0.1/" | md5sum | awk '{print $1}')
+VIA_PORT=$(curl -s --max-time 5 -H "Host: $DOMAIN" "http://127.0.0.1:${HOST_PORT}/" | md5sum | awk '{print $1}')
+echo "  HTTP  md5 (301 page)  = $VIA_HTTP"
+echo "  HTTPS md5 (real body) = $VIA_HTTPS"
+echo "  :${HOST_PORT} md5 (container) = $VIA_PORT"
+
+if [ -n "$VIA_HTTPS" ] && [ "$VIA_HTTPS" = "$VIA_PORT" ]; then
+  echo "  ✅ HTTPS 反代已同步，https://${DOMAIN}/ 内容与容器一致 (md5=${VIA_HTTPS})"
+else
+  echo "  ⚠️ HTTPS 内容与容器 md5 不一致，请人工检查"
+fi
