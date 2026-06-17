@@ -30,7 +30,7 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
         if ( savedTheme === 'system') {
           theme = systemTheme;
         } else {
-          theme = savedTheme || 'light';
+          theme = savedTheme || 'dark';
         }
         localStorage.setItem('theme', savedTheme || theme);
         document.documentElement.setAttribute('data-theme', theme);

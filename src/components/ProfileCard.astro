@@ -84,7 +84,7 @@ const resolvedLinks = links.map(link => ({
                             data-copy-failed={t("profileCard.copyFailed")}
                             aria-label={`${t("profileCard.copy")} ${link.name}`}
                         >
-                            <Icon name={link.icon} class="w-4.5 h-4.5" />
+                            <Icon name={link.icon} class="w-5 h-5" />
                         </button>
                     ) : link.resolvedQr ? (
                         <!-- QR-only: hover 显示二维码，不跳转 -->
@@ -92,7 +92,7 @@ const resolvedLinks = links.map(link => ({
                             class="profile-link flex items-center justify-center w-9 h-9 rounded-full text-[var(--text-color)] hover:bg-[var(--button-hover-color)] hover:text-[var(--link-color)] transition-all duration-200 cursor-default"
                             aria-label={link.name}
                         >
-                            <Icon name={link.icon} class="w-4.5 h-4.5" />
+                            <Icon name={link.icon} class="w-5 h-5" />
                         </div>
                     ) : (
                         <a
@@ -102,11 +102,12 @@ const resolvedLinks = links.map(link => ({
                             class="profile-link flex items-center justify-center w-9 h-9 rounded-full text-[var(--text-color)] hover:bg-[var(--button-hover-color)] hover:text-[var(--link-color)] active:scale-90 transition-all duration-200"
                             aria-label={link.name}
                         >
-                            <Icon name={link.icon} class="w-4.5 h-4.5" />
+                            <Icon name={link.icon} class="w-5 h-5" />
                         </a>
                     )}
                     {link.resolvedQr && (
-                        <div class="qr-popup absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover/link:block z-50 pointer-events-none">
+                        <div class="qr-popup absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover/link:block z-50">
+                            <div class="absolute left-0 right-0 -bottom-2 h-2"></div>
                             <div class="bg-white rounded-lg shadow-xl border border-gray-200 p-2">
                                 <img src={link.resolvedQr} alt={`${link.name} QR`} class="w-32 h-32 object-contain" />
                             </div>
