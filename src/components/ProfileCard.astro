@@ -130,6 +130,12 @@ const resolvedLinks = links.map(link => ({
     .profile-card :global(.profile-link svg) {
         transition: transform 0.2s ease;
     }
+    /* QR popup: explicit width so absolutely-positioned container
+       doesn't shrink-to-fit around the <img> (which itself has
+       max-width: 100% — chicken-and-egg collapses it to ~0px). */
+    .profile-card :global(.qr-popup) {
+        width: max-content;
+    }
 </style>
 
 <script>
