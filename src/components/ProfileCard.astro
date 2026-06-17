@@ -106,7 +106,7 @@ const resolvedLinks = links.map(link => ({
                         </a>
                     )}
                     {link.resolvedQr && (
-                        <div class="qr-popup absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover/link:block z-50">
+                        <div class="qr-popup absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden z-50" data-qr-trigger>
                             <div class="absolute left-0 right-0 -bottom-2 h-2"></div>
                             <div class="bg-white rounded-lg shadow-xl border border-gray-200 p-2">
                                 <img src={link.resolvedQr} alt={`${link.name} QR`} class="w-32 h-32 object-contain" />
@@ -133,6 +133,29 @@ const resolvedLinks = links.map(link => ({
 </style>
 
 <script>
+    function initQrPopups() {
+        const triggers = document.querySelectorAll<HTMLElement>('[data-qr-trigger]');
+        triggers.forEach((popup) => {
+            const wrapper = popup.parentElement;
+            if (!wrapper) return;
+            if (wrapper.dataset.qrBound === 'true') return;
+            wrapper.dataset.qrBound = 'true';
+            const show = () => popup.classList.remove('hidden');
+            const hide = () => popup.classList.add('hidden');
+            wrapper.addEventListener('mouseenter', show);
+            wrapper.addEventListener('mouseleave', hide);
+            // Touch support: tap to toggle
+            wrapper.addEventListener('click', (e) => {
+                e.preventDefault();
+                popup.classList.toggle('hidden');
+            });
+            // Hide when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!wrapper.contains(e.target as Node)) hide();
+            });
+        });
+    }
+
     function initCopyButtons() {
         const buttons = document.querySelectorAll<HTMLButtonElement>('.profile-link[data-copy-value]');
         if (buttons.length === 0) return;
@@ -178,5 +201,8 @@ const resolvedLinks = links.map(link => ({
         }, 1500);
     }
 
-    document.addEventListener('astro:page-load', initCopyButtons);
+    document.addEventListener('astro:page-load', () => {
+        initCopyButtons();
+        initQrPopups();
+    });
 </script>
