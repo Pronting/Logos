@@ -31,3 +31,4 @@ pnpm-debug.log*
 .claude
 .spec-workflow
 CLAUDE.md
+OPERATIONS.md
