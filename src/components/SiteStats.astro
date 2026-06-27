@@ -1,44 +1,13 @@
 ---
-import { getCollection } from 'astro:content';
 import { i18n } from "astro:config/client";
 import { profileConfig } from '@/config';
+import { getSiteTotals } from '@utils/content-utils';
 import i18nit from '@i18n/translation';
 
 const currentLang = Astro.currentLocale || i18n!.defaultLocale;
 const t = i18nit(currentLang);
 
-// 统计所有 tab 的文章数量（去重后按语言解析）
-const defaultLang = i18n!.defaultLocale;
-
-function countByLocale(entries: { id: string }[]): number {
-  const grouped = new Map<string, Set<string>>();
-  for (const entry of entries) {
-    const parts = entry.id.split('/');
-    const fileName = parts[parts.length - 1];
-    const dirId = parts.slice(0, -1).join('/');
-    const lang = fileName.replace('.md', '');
-    if (!grouped.has(dirId)) grouped.set(dirId, new Set());
-    grouped.get(dirId)!.add(lang);
-  }
-  let count = 0;
-  for (const langs of grouped.values()) {
-    // 每个目录只计数一次（优先当前语言，否则默认语言）
-    if (langs.has(currentLang) || langs.has(defaultLang)) count++;
-  }
-  return count;
-}
-
-const defaultFilter = ({ data }: any) => {
-  return import.meta.env.PROD ? data.draft !== true : true;
-};
-
-const [blogEntries, articleEntries, columnArticleEntries] = await Promise.all([
-  getCollection('blog', defaultFilter),
-  getCollection('articles', defaultFilter),
-  getCollection('columnArticles', defaultFilter),
-]);
-
-const totalArticles = countByLocale(blogEntries) + countByLocale(articleEntries) + countByLocale(columnArticleEntries);
+const { articleCount: totalArticles } = await getSiteTotals(currentLang);
 
 // 计算运行时间
 const startDate = new Date(profileConfig.startYear, 0, 1);

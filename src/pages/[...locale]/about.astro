@@ -35,7 +35,7 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
         <Markdown class="mb-6 markdown-content onload-animation">
             <Content />
         </Markdown>
-        <ContributionHeatmap dates={contributions} client:load />
+        <ContributionHeatmap dates={contributions} lang={currentLang} client:load />
     </div>
     <FabMenu showBackBottom={true} />
 </MainPageLayout>

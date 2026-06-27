@@ -12,11 +12,12 @@ if (profileConfig.indexPage) {
 ---
 
 <!-- footer -->
-<footer class="flex flex-col md:flex-row md:justify-between items-start md:items-center py-10 text-[var(--text-color-70)] max-w-[var(--header-width)] mx-auto w-full">
-    <div class="mb-1 md:mb-0">
-        © {profileConfig.startYear} - {new Date().getFullYear()} <a class="link-line" target="_self" href={introPage}>{profileConfig.name}</a>. 
+<footer class="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-center gap-2 md:gap-4 py-10 text-[var(--text-color-70)] max-w-[var(--header-width)] mx-auto w-full">
+    <div class="justify-self-start">
+        © {profileConfig.startYear} - {new Date().getFullYear()} <a class="link-line" target="_self" href={introPage}>{profileConfig.name}</a>.
     </div>
-    <div class="right">
+    <a class="beian-link justify-self-center" target="_blank" rel="noopener noreferrer" href="https://beian.miit.gov.cn/">蜀ICP备2026032242号</a>
+    <div class="right justify-self-start md:justify-self-end">
         <p>Powered by 
         <a target="_blank" href="https://astro.build" title="Astro" class="tooltip-wrapper"><Icon name="simple-icons:astro" class="inline-block" /></a> 
         <a target="_blank" href="https://svelte.dev/" title="Svelte" class="tooltip-wrapper"><Icon name="simple-icons:svelte" class="inline-block"/></a> 
@@ -42,6 +43,17 @@ if (profileConfig.indexPage) {
     }
     
     .right a:hover {
+        color: var(--link-color);
+    }
+
+    .beian-link {
+        color: inherit;
+        font-size: 0.875rem;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .beian-link:hover {
         color: var(--link-color);
     }
     
