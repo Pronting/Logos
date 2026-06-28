@@ -9,12 +9,16 @@ on:
       - 'src/components/**'
       - 'src/i18n/**'
       - 'src/config.ts'
+      - 'src/utils/**'
+      - 'src/data/**'
+      - 'script/generate-ai-summaries.mjs'
       - 'astro.config.mjs'
       - 'package.json'
       - 'pnpm-lock.yaml'
       - 'Dockerfile'
       - 'nginx.conf'
       - 'public/**'
+      - '.github/workflows/deploy.yml'
 
 concurrency:
   group: deploy-server
@@ -38,6 +42,13 @@ jobs:
 
             DEPLOY_PATH="${{ secrets.DEPLOY_PATH }}"
             HEALTH_URL="${{ secrets.DEPLOY_HEALTH_URL || 'http://localhost:9090/' }}"
+            export AI_SUMMARY_API_KEY="${{ secrets.AI_SUMMARY_API_KEY || secrets.LLM_API_KEY || secrets.DEEPSEEK_API_KEY }}"
+            export AI_SUMMARY_BASE_URL="${{ secrets.AI_SUMMARY_BASE_URL || secrets.LLM_BASE_URL || secrets.DEEPSEEK_BASE_URL || 'https://api.deepseek.com/v1' }}"
+            export AI_SUMMARY_API_URL="${{ secrets.AI_SUMMARY_API_URL || secrets.LLM_API_URL || secrets.DEEPSEEK_API_URL }}"
+            export AI_SUMMARY_API_PATH="${{ secrets.AI_SUMMARY_API_PATH || secrets.LLM_API_PATH || secrets.DEEPSEEK_API_PATH || '/chat/completions' }}"
+            export AI_SUMMARY_MODEL="${{ secrets.AI_SUMMARY_MODEL || secrets.LLM_MODEL || secrets.DEEPSEEK_MODEL || 'deepseek-chat' }}"
+            export AI_SUMMARY_TEMPERATURE="${{ secrets.AI_SUMMARY_TEMPERATURE || '0.2' }}"
+            export AI_SUMMARY_MAX_INPUT_CHARS="${{ secrets.AI_SUMMARY_MAX_INPUT_CHARS || '18000' }}"
             IMAGE_NAME="logos-app"
             CONTAINER_NAME="logos-app"
             HOST_PORT=9090
@@ -91,6 +102,12 @@ jobs:
             fi
             echo "  pnpm = $(pnpm --version), node = $(node --version)"
             pnpm install --frozen-lockfile
+            if [ -z "${AI_SUMMARY_API_KEY:-}" ]; then
+              echo "❌ AI_SUMMARY_API_KEY Secret 未配置，无法在部署时生成 AI 摘要。" >&2
+              echo "   请在 GitHub repo Settings → Secrets and variables → Actions 中添加 AI_SUMMARY_API_KEY。" >&2
+              exit 1
+            fi
+            pnpm ai:summary
             pnpm build
 
             echo "===== 4. 构建新镜像 ====="

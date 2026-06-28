@@ -10,6 +10,7 @@ import LicenseCard from '@components/misc/LicenseCard.astro'
 import Comments from '@components/comment/Comments.svelte'
 import Twikoo from '@components/comment/thirdparty/twikoo.astro'
 import BlogNavi from '@components/control/BlogNavi.astro'
+import AISummary from '@components/AISummary.astro'
 
 import { getCollection, render } from 'astro:content'
 import { i18n } from "astro:config/client";
@@ -20,6 +21,7 @@ import { blogCoverUrl } from '@/utils/url-utils'
 import { formatFullDate } from '@/utils/time'
 import { getBlogEntrySort } from '@utils/content-utils'
 import { getRelativeLocaleUrl } from '@utils/url-utils';
+import { createAiSummaryKey, getAiSummary } from '@utils/ai-summary';
 
 
 const currentLang = Astro.currentLocale || i18n!.defaultLocale;
@@ -64,6 +66,8 @@ const pageTitle = entry.data.title + ' - ' + siteConfig.title;
 const image = blogCoverUrl(entry.data.cover || entry.data.image, entry.id);
 
 const { remarkPluginFrontmatter } = await render(entry);
+const summaryLocale = entry.isFallback ? i18n!.defaultLocale : currentLang;
+const aiSummary = getAiSummary(createAiSummaryKey("blog", summaryLocale, entry.id));
 ---
 <MainPageLayout title={pageTitle} lang={currentLang} description={entry.data.description}>
     <div class="mx-auto w-full max-w-[var(--page-width)] py-8 md:mt-0 mt-18">
@@ -98,6 +102,7 @@ const { remarkPluginFrontmatter } = await render(entry);
                     </p>
                 </div>
             </div>
+            <AISummary summary={aiSummary?.summary} lang={summaryLocale} />
         </div>
         {image && entry.data.showCover !== false && (
             <div class="cover overflow-hidden">

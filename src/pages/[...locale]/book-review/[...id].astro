@@ -7,6 +7,7 @@ import ImageModule from '@components/misc/ImageModule.astro'
 import FabMenu from '@components/control/FabMenu.astro'
 import TOC from '@components/TOC.svelte'
 import Comments from '@components/comment/Comments.svelte'
+import AISummary from '@components/AISummary.astro'
 
 import { getCollection, render } from 'astro:content'
 import { i18n } from "astro:config/client";
@@ -15,6 +16,7 @@ import { Icon } from "astro-icon/components";
 import { getRelativeLocaleUrl, contentCoverUrl } from '@/utils/url-utils'
 import { formatFullDate } from '@/utils/time'
 import { getBookReviews, buildBookInfoMap } from '@utils/book-utils'
+import { createAiSummaryKey, getAiSummary, stripLocaleFromId } from '@utils/ai-summary'
 
 const currentLang = Astro.currentLocale || i18n!.defaultLocale;
 const t = i18nit(currentLang);
@@ -53,6 +55,9 @@ const relatedBook = entry.data.bookSlug ? bookInfoMap.get(entry.data.bookSlug) :
 const bookshelfUrl = entry.data.bookSlug
     ? getRelativeLocaleUrl(currentLang, `/bookshelf/?book=${encodeURIComponent(entry.data.bookSlug)}`)
     : "";
+const summaryId = stripLocaleFromId(entry.id, i18n!.locales as string[]);
+const summaryLocale = entry.id.endsWith(`/${currentLang}`) ? currentLang : i18n!.defaultLocale;
+const aiSummary = getAiSummary(createAiSummaryKey("bookReview", summaryLocale, summaryId));
 ---
 
 <MainPageLayout title={pageTitle} lang={currentLang} description={entry.data.description}>
@@ -84,6 +89,7 @@ const bookshelfUrl = entry.data.bookSlug
                     </p>
                 )}
             </div>
+            <AISummary summary={aiSummary?.summary} lang={summaryLocale} />
             {relatedBook && (
                 <div class="flex justify-center mt-4">
                     <a

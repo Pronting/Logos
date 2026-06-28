@@ -20,19 +20,19 @@ function getPostUrl(id: string) {
 }
 ---
 
-<nav data-aos="fade-up" class="mt-8 border-t border-[var(--button-border-color)] pt-4 ">
-    <div class="flex flex-row items-stretch gap-2 sm:gap-4">
+<nav data-aos="fade-up" class="blog-navi">
+    <div class="blog-navi-grid">
         <div class="flex-1 min-w-0">
             {prev && (
             <a 
                 href={getPostUrl(prev.id)} 
-                class="group flex h-full flex-col gap-1 rounded-lg p-3 no-underline transition-all hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)] sm:p-4"
+                class="blog-navi-link group"
             >
-                <div class="flex items-center gap-1.5 text-[var(--text-color-70)]">
+                <div class="blog-navi-label">
                     <Icon name="fa6-solid:arrow-left" class="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1" />
-                    <span class="text-sm transition-colors group-hover:text-[var(--text-color)]">{t("blogNavi.prev")}</span>
+                    <span>{t("blogNavi.prev")}</span>
                 </div>
-                <span class="transition-colors text-lg font-bold text-[var(--text-color)] group-hover:text-[var(--link-color)] group-active:text-[var(--link-color)]">
+                <span class="blog-navi-title">
                     {prev.data.title}
                 </span>
             </a>
@@ -42,13 +42,13 @@ function getPostUrl(id: string) {
             {next && (
             <a 
                 href={getPostUrl(next.id)} 
-                class="group flex h-full flex-col items-end gap-1 rounded-lg p-3 text-right no-underline transition-all hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)] sm:p-4"
+                class="blog-navi-link blog-navi-link-next group"
             >
-                <div class="flex items-center gap-1.5 text-[var(--text-color-70)]">
-                    <span class="text-sm transition-colors group-hover:text-[var(--text-color)]">{t("blogNavi.next")}</span>
+                <div class="blog-navi-label">
+                    <span>{t("blogNavi.next")}</span>
                     <Icon name="fa6-solid:arrow-right" class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </div>
-                <span class="transition-colors text-lg font-bold text-[var(--text-color)] group-hover:text-[var(--link-color)] group-active:text-[var(--link-color)]">
+                <span class="blog-navi-title">
                     {next.data.title}
                 </span>
             </a>
@@ -56,3 +56,84 @@ function getPostUrl(id: string) {
         </div>
     </div>
 </nav>
+
+<style>
+  .blog-navi {
+    margin-top: 0.85rem;
+    padding: 0.55rem;
+    border: 1px solid var(--button-border-color);
+    border-radius: 6px;
+    background: var(--surface-color);
+  }
+
+  .blog-navi-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+
+  .blog-navi-link {
+    display: flex;
+    height: 100%;
+    min-height: 5.25rem;
+    flex-direction: column;
+    gap: 0.45rem;
+    justify-content: center;
+    padding: 0.85rem 0.95rem;
+    border-radius: 5px;
+    color: inherit;
+    text-decoration: none;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .blog-navi-link:hover {
+    background: var(--button-hover-color);
+  }
+
+  .blog-navi-link-next {
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .blog-navi-label {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--text-color-70);
+    font-size: 0.82rem;
+    line-height: 1.3;
+    transition: color 0.2s ease;
+  }
+
+  .blog-navi-link:hover .blog-navi-label {
+    color: var(--text-color);
+  }
+
+  .blog-navi-title {
+    display: -webkit-box;
+    overflow: hidden;
+    color: var(--text-color);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.45;
+    transition: color 0.2s ease;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .blog-navi-link:hover .blog-navi-title {
+    color: var(--link-color);
+  }
+
+  @media (max-width: 640px) {
+    .blog-navi-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .blog-navi-link {
+      min-height: 4.5rem;
+    }
+  }
+</style>

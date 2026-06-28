@@ -8,6 +8,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "newpost": "node script/newpost.js",
+    "ai:summary": "node script/generate-ai-summaries.mjs",
+    "ai:summary:force": "node script/generate-ai-summaries.mjs --force",
     "test": "vitest run",
     "test:watch": "vitest"
   },
