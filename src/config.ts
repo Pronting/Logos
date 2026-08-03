@@ -85,6 +85,12 @@ export const friendLinkConfig: FriendLink[] = [
         description: 'Build fast websites, faster.'
     },
     {
+        name: '崔亮的博客',
+        avatar: 'https://pront-base-1318237185.cos.ap-guangzhou.myqcloud.com/20260803113626379.png',
+        url: 'https://www.cuiliangblog.cn',
+        description: '纵横互联网看到的最有用的博客'
+    },
+    {
         name: 'leeeeee',
         avatar: 'https://pront-base-1318237185.cos.ap-guangzhou.myqcloud.com/20260803103545097.png',
         url: 'https://zhoutianle.novamate.top',

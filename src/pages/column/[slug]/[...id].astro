@@ -68,7 +68,7 @@ const aiSummary = getAiSummary(createAiSummaryKey("columnArticle", summaryLocale
 
         <!-- Article header -->
         <div class="mb-18 text-center">
-            <h1 class="font-bold text-3xl mb-2 pt-10 text-[var(--text-color)]">{article.data.title}</h1>
+            <h1 data-pagefind-body class="font-bold text-3xl mb-2 pt-10 text-[var(--text-color)]">{article.data.title}</h1>
             <p class="flex flex-wrap items-center justify-center font-bold text-[var(--text-color-70)] mt-6">
                 <Icon name="fa6-solid:calendar-days" class="mr-2"></Icon>
                 <span>{formatFullDate(article.data.pubDate, currentLang)}</span>
