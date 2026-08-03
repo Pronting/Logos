@@ -36,7 +36,7 @@ export const profileConfig: ProfileConfig = {
     avatar: "assets/avatar.png", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
     name: "pront",
     description: "Life is colorful!",
-    motto: "持续发光发热",
+    motto: "一知半解也值得被记录",
     indexPage: "https://github.com/Pronting",
     startYear: 2024,
     links: [
@@ -83,6 +83,12 @@ export const friendLinkConfig: FriendLink[] = [
         avatar: 'https://avatars.githubusercontent.com/u/44914786',
         url: 'https://astro.build',
         description: 'Build fast websites, faster.'
+    },
+    {
+        name: 'leeeeee',
+        avatar: 'https://pront-base-1318237185.cos.ap-guangzhou.myqcloud.com/20260803103545097.png',
+        url: 'https://zhoutianle.novamate.top',
+        description: '一位朋友的主頁'
     }
     // Add more friend links here
 ]
