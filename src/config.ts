@@ -76,13 +76,7 @@ export const friendLinkConfig: FriendLink[] = [
         name: 'Motues',
         avatar: 'https://www.motues.top/avatar.jpg',
         url: 'https://www.motues.top',
-        description: 'Like River!'
-    },
-    {
-        name: 'Astro',
-        avatar: 'https://avatars.githubusercontent.com/u/44914786',
-        url: 'https://astro.build',
-        description: 'Build fast websites, faster.'
+        description: '原创作者'
     },
     {
         name: 'weihubeats',
