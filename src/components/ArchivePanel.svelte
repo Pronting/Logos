@@ -187,6 +187,12 @@
                                 </span>
 
                                 <span class="text-lg group-hover:pl-2 group-hover:text-[var(--link-color)] group-hover:font-bold transition-all duration-200 flex-1 group-active:text-[var(--link-color)]">
+                                    {#if (post.data.pinTop ?? 0) > 0}
+                                        <span class="inline-flex items-center gap-1 mr-2 px-1.5 py-0.5 text-xs font-semibold rounded border border-[var(--link-color)] text-[var(--link-color)] bg-[var(--button-hover-color)]">
+                                            <Icon icon="fluent:pin-24-filled" class="w-3 h-3" />
+                                            {t("pagecard.pinned")}
+                                        </span>
+                                    {/if}
                                     {post.data.title}
                                     {#if post.isFallback}
                                         <span class="inline-block px-1 ml-2 text-xs font-mono uppercase bg-[var(--button-hover-color)] rounded border border-[var(--button-border-color)]">

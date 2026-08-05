@@ -5,7 +5,7 @@ import { i18n } from "astro:config/client";
 /**
  * 获取排序后的博客条目
  * @param filter 过滤函数，可选，默认过滤掉生产环境中的草稿文章
- * @param sort 排序函数，可选，默认按发布日期降序排列
+ * @param sort 排序函数，可选，默认按置顶优先（pinTop 降序），再按发布日期降序
  * @returns 排序后的博客条目数组
  */
 // 1. 定义一个扩展类型，包含 fallback 状态
@@ -24,6 +24,11 @@ export async function getBlogEntrySort(
   };
 
   const defaultSort = (a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) => {
+    const pinTopA = a.data.pinTop ?? 0;
+    const pinTopB = b.data.pinTop ?? 0;
+    if (pinTopA > 0 && pinTopB > 0) return pinTopB - pinTopA;
+    if (pinTopA > 0) return -1;
+    if (pinTopB > 0) return 1;
     return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
   };
 

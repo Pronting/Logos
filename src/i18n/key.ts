@@ -65,6 +65,7 @@ export interface Translation {
         words: string;
         minutes: string;
         uncategorized: string;
+        pinned: string;
     }
     comments: {
         name: string;

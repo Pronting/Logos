@@ -1,39 +1,7 @@
+Hi, I'm pront. A software engineer focused on **AI Agent development** and **Java engineering**, always tracking new trends and tools in the AI field.
 
-Momo originates from Xiaohongshu's 📕, serving as every new user's initial nickname, symbolizing a fresh start. The blog's design philosophy stems from this concept, beginning with simplicity to strike a balance between complex functionality and minimalist aesthetics.
+I believe "even a half-understanding is worth recording", and I make it a habit to turn the pitfalls I've stepped into, the questions I've figured out, and the engineering practices I've tried into words. This blog documents my code, my reading, and my building, as well as the thinking itself.
 
-## ✨ Features
+## About This Site
 
-* **Minimalist Design**: Clean page layout with black and white as primary colors, accented by blue
-* **Dark Mode**: Supports manual switching or automatic system adaptation
-* **Article Search**: Implements localized search using [pagefind](https://pagefind.app/)
-* **Internationalization (i18n)**: Supports multilingual switching, currently available in Simplified Chinese and English
-* **Mobile Optimization**: Components optimized for mobile devices, delivering the same experience as desktop browsers
-* **Commenting System**: Supports local deployment and Cloudflare deployment. Details in [Backend](https://github.com/Motues/Momo-Backend)
-* **Extensive Markdown syntax**: Supports Katex, Typst, and Alert components, GitHub cards, custom syntax, and more
-* Additional Core Features: Post categorization, directory, RSS subscription, text statistics, reading time
-
-
-## 🚀 Quick Start
-
-1. Clone this project
-    ```bash
-    git clone https://github.com/Motues/Momo.git
-    cd Momo
-    ```
-2. Run `pnpm install` to install dependencies (use `npm install -g pnpm` to install `pnpm`)
-3. Run `pnpm dev` to start the development server
-
-## 🔧 Configuration
-
-Refer to the [Configuration Guide](/en/blog/intro/config) and read the corresponding articles for detailed information.
-
-## 📚 Updates
-
-Refer to the [Update Guide](/en/blog/intro/release) for instructions on updating the project.
-
-
-## 📚 References
-
-* [Astro](https://astro.build/)
-* [Fuwari](https://github.com/saicaca/fuwari)
-* [Tyndall](https://github.com/moyuin-aka/tyndall-public)
+Logos comes from the Greek λόγος, which means word and speech. So the blog's design direction is not a single direction, but the result of crossing and combining multiple fields.

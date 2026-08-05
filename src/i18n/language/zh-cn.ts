@@ -66,7 +66,8 @@ const translation: Translation = {
     pagecard: {
         words: "字",
         minutes: "分钟",
-        uncategorized: "未分类"
+        uncategorized: "未分类",
+        pinned: "置顶"
     },
     comments: {
         name: "昵称",

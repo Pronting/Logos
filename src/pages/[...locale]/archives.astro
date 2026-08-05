@@ -38,7 +38,13 @@ const allPosts = [
     ...allBlogPosts.map(p => ({ ...p, urlPrefix: "/blog/" })),
     ...bookReviews,
     ...columnArticles,
-].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+].sort((a, b) => {
+    // 置顶优先（pinTop 降序），再按发布日期降序
+    const pinTopA = a.data.pinTop ?? 0;
+    const pinTopB = b.data.pinTop ?? 0;
+    if (pinTopA !== pinTopB) return pinTopB - pinTopA;
+    return (b.data.pubDate?.valueOf() ?? 0) - (a.data.pubDate?.valueOf() ?? 0);
+});
 
 const pageTitle = t("header.archive") + " - " + siteConfig.title;
 ---

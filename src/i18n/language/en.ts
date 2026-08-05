@@ -66,7 +66,8 @@ const translation: Translation = {
     pagecard: {
         words: "words",
         minutes: "min read",
-        uncategorized: "Uncategorized"
+        uncategorized: "Uncategorized",
+        pinned: "Pinned"
     },
     comments: {
         name: "Name",

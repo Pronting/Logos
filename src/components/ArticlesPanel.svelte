@@ -153,7 +153,10 @@
                 <a href={article.data.link} target="_blank" rel="noopener noreferrer" class="title text-xl font-semibold text-[var(--text-color)] mb-3 hover:text-[var(--link-color)] active:text-[var(--link-color)] flex items-center group transition-colors duration-300 ease-in-out">
                   <span class="flex items-center">
                     {#if article.data.pinTop > 0}
-                      <Icon icon="fluent:pin-24-filled" class="mr-1" />
+                      <span class="inline-flex items-center gap-1 mr-2 px-1.5 py-0.5 text-xs font-semibold rounded border border-[var(--link-color)] text-[var(--link-color)] bg-[var(--button-hover-color)]">
+                        <Icon icon="fluent:pin-24-filled" class="w-3 h-3" />
+                        {t("pagecard.pinned")}
+                      </span>
                     {/if}
                     {article.data.title}
                   </span>
