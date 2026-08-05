@@ -85,6 +85,12 @@ export const friendLinkConfig: FriendLink[] = [
         description: 'Build fast websites, faster.'
     },
     {
+        name: 'weihubeats',
+        avatar: 'https://pront-base-1318237185.cos.ap-guangzhou.myqcloud.com/20260805211353993.png',
+        url: 'https://github.com/weihubeats',
+        description: '一位前辈，apache成员，skywalking/RocketMQ等若干项目开源作者'
+    },
+    {
         name: '崔亮的博客',
         avatar: 'https://pront-base-1318237185.cos.ap-guangzhou.myqcloud.com/20260803113626379.png',
         url: 'https://www.cuiliangblog.cn',
