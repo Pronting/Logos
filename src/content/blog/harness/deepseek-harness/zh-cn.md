@@ -64,6 +64,13 @@ pnpm dsh web
 第一感觉这不就 Codex 那个味道吗？多项目管理，多线程会话，权限控制，插件还支持宠物
 
 
+这缓存命中率大的惊人，一般在 99% 甚至到 100 %
+![](https://pront-base-1318237185.cos.ap-guangzhou.myqcloud.com/20260815205000111.png)
+
+
+做plan 的时候也很惊艳
+![](https://pront-base-1318237185.cos.ap-guangzhou.myqcloud.com/20260815210331550.png)
+
 # 工程化能力体现
 
 
