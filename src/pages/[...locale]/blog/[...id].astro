@@ -11,6 +11,7 @@ import Comments from '@components/comment/Comments.svelte'
 import Twikoo from '@components/comment/thirdparty/twikoo.astro'
 import BlogNavi from '@components/control/BlogNavi.astro'
 import AISummary from '@components/AISummary.astro'
+import ViewCounter from '@components/ViewCounter.astro'
 
 import { getCollection, render } from 'astro:content'
 import { i18n } from "astro:config/client";
@@ -100,6 +101,7 @@ const aiSummary = getAiSummary(createAiSummaryKey("blog", summaryLocale, entry.i
                             <span class="tag-pill">{t("pagecard.uncategorized")}</span>
                         )}
                     </p>
+                    <ViewCounter lang={currentLang} />
                 </div>
             </div>
             <AISummary summary={aiSummary?.summary} lang={summaryLocale} />

@@ -66,6 +66,7 @@ export interface Translation {
         minutes: string;
         uncategorized: string;
         pinned: string;
+        views: string;
     }
     comments: {
         name: string;
@@ -178,6 +179,7 @@ export interface Translation {
         heroSentence: string;
         runningDays: string;
         runningYears: string;
+        totalVisits: string;
     },
     articles: {
         noResults: string;

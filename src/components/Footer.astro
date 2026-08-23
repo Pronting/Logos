@@ -2,6 +2,7 @@
 import { Icon } from "astro-icon/components";
 import { profileConfig, siteConfig } from "../config";
 import { i18n } from "astro:config/client";
+import SiteViews from "./SiteViews.astro";
 
 let introPage : string;
 
@@ -49,6 +50,7 @@ const initialRuntime = formatRuntime(Date.now() - startTime);
                 <span>{isChinese ? "已运行" : "Running for"}</span>
                 <time data-runtime-value>{initialRuntime}</time>
             </div>
+            <SiteViews />
             <div>© {profileConfig.startYear} - {new Date().getFullYear()} {profileConfig.name}</div>
             <a class="beian-link" target="_blank" rel="noopener noreferrer" href="https://beian.miit.gov.cn/">蜀ICP备2026032242号</a>
         </section>

@@ -8,6 +8,7 @@ import FabMenu from '@components/control/FabMenu.astro'
 import TOC from '@components/TOC.svelte'
 import Comments from '@components/comment/Comments.svelte'
 import AISummary from '@components/AISummary.astro'
+import ViewCounter from '@components/ViewCounter.astro'
 
 import { getCollection, render } from 'astro:content'
 import { i18n } from "astro:config/client";
@@ -88,6 +89,7 @@ const aiSummary = getAiSummary(createAiSummaryKey("bookReview", summaryLocale, s
                         ))}
                     </p>
                 )}
+                <ViewCounter lang={currentLang} />
             </div>
             <AISummary summary={aiSummary?.summary} lang={summaryLocale} />
             {relatedBook && (

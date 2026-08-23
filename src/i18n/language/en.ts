@@ -67,7 +67,8 @@ const translation: Translation = {
         words: "words",
         minutes: "min read",
         uncategorized: "Uncategorized",
-        pinned: "Pinned"
+        pinned: "Pinned",
+        views: "views"
     },
     comments: {
         name: "Name",
@@ -180,6 +181,7 @@ const translation: Translation = {
         heroSentence: "{count} articles, {words} words so far",
         runningDays: "Running for {days} days",
         runningYears: "Running for {years} years {days} days",
+        totalVisits: "Total visits",
     },
     articles: {
         noResults: "No curated articles yet",

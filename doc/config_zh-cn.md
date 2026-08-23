@@ -30,6 +30,9 @@
     * `enable`: 是否启用评论功能
     * `platform`: 评论平台
     * `backendUrl`： 后端的地址
+* `statistics`
+    * `views`
+        * `enable`: 是否显示文章/站点浏览量（基于不蒜子 busuanzi 统计，无需后端）
 * `theme`
     * `AOS`: 是否启用AOS动画
     * `LQIP`: 是否启用LQIP

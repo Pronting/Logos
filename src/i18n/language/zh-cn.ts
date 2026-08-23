@@ -67,7 +67,8 @@ const translation: Translation = {
         words: "字",
         minutes: "分钟",
         uncategorized: "未分类",
-        pinned: "置顶"
+        pinned: "置顶",
+        views: "次浏览"
     },
     comments: {
         name: "昵称",
@@ -180,6 +181,7 @@ const translation: Translation = {
         heroSentence: "累计 {count} 篇文章 {words} 个字",
         runningDays: "已运行 {days} 天",
         runningYears: "已运行 {years} 年 {days} 天",
+        totalVisits: "累计访问",
     },
     articles: {
         noResults: "暂无好文推荐",

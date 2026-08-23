@@ -17,6 +17,11 @@ export type SiteConfig = {
         platform: string;
         backendUrl: string;
     };
+    statistics: {
+        views: {
+            enable: boolean;
+        };
+    };
     theme: {
         AOS: boolean;
         LQIP: boolean;

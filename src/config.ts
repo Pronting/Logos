@@ -25,6 +25,11 @@ export const siteConfig: SiteConfig = {
         platform: "default", // Comment platform, set "default" to use Momo-backend, also supports "twikoo"
         backendUrl: "https://api.pront.site" // Backend URL for comments
     },
+    statistics: {
+        views: {
+            enable: true, // Whether to show article / site view counts (powered by busuanzi, no backend required)
+        }
+    },
     theme: {
         AOS: true, // Whether to enable AOS (Animate On Scroll) for animations
         LQIP: true, // Whether to enable LQIP (Low-Quality Image Placeholder) for image placeholders
