@@ -18,7 +18,7 @@ export interface BookFrontmatter {
     /** 一句话简短评价 */
     briefComment?: string;
     readDate?: Date;
-    readTimeMinutes?: number;
+    readTimeHours?: number;
     year?: number;
     pinTop?: number;
     draft?: boolean;
@@ -53,7 +53,7 @@ export interface BookMeta {
     /** 一句话简短评价 */
     briefComment: string;
     readDate: Date | null;
-    readTimeMinutes: number | null;
+    readTimeHours: number | null;
     year: number | null;
     pinTop: number;
     /** 关联的书评文章链接 */

@@ -5,7 +5,7 @@ tags: ["政治经济学"]
 rating: "recommended"
 summary: "An accessible introduction to understanding China's economic development and the role of government, focusing on local government investment and financing."
 readDate: 2025-12-15
-readTimeMinutes: 480
+readTimeHours: 8
 year: 2021
 pinTop: 1
 ---

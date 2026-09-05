@@ -7,7 +7,7 @@ rating: "recommended"
 summary: "一部理解中国经济发展与政府角色的入门佳作，以地方政府投融资为主线，深入浅出地讲解了中国政府在经济发展中所扮演的角色。"
 briefComment: "看不懂房价？就业？产业策略？债务？股票？政府于产业之间的作用？ 那么看这本书就对了，信息密度极高的精品"
 readDate: 2025-12-15
-readTimeMinutes: 480
+readTimeHours: 8
 year: 2021
 pinTop: 1
 ---

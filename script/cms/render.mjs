@@ -24,7 +24,7 @@ const SCALAR_KEYS = new Set([
   'summary',
   'briefComment',
   'readDate',
-  'readTimeMinutes',
+  'readTimeHours',
   'year',
   'icon',
   'link',

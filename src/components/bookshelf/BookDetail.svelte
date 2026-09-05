@@ -154,10 +154,10 @@
                   {" "}{new Date(book.readDate).toLocaleDateString("zh-CN")}
                 </div>
               {/if}
-              {#if book.readTimeMinutes}
+              {#if book.readTimeHours != null}
                 <div>
                   <span class="font-medium text-[var(--text-color)]">{readTimeLabel}:</span>
-                  {" "}{book.readTimeMinutes} 分钟
+                  {" "}{book.readTimeHours} 小时
                 </div>
               {/if}
               {#if book.year}

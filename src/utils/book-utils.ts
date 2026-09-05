@@ -31,7 +31,7 @@ export function toBookMeta(
         summary: data.summary ?? "",
         briefComment: data.briefComment ?? "",
         readDate: data.readDate ?? null,
-        readTimeMinutes: data.readTimeMinutes ?? null,
+        readTimeHours: data.readTimeHours ?? null,
         year: data.year ?? null,
         pinTop: data.pinTop ?? 0,
         reviewLinks: reviewLinks ?? [],

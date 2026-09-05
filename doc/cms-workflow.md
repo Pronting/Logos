@@ -105,7 +105,7 @@ tags: [好文]
 | Category | 必填 | 可选 |
 |---|---|---|
 | **blog** | category, title, slug, pubDate, slugId | description, image, cover, tags, pinTop, draft, body |
-| **book** | category, title, slug, author, tags, rating | cover, summary, briefComment, readDate, readTimeMinutes, year, pinTop, draft, body |
+| **book** | category, title, slug, author, tags, rating | cover, summary, briefComment, readDate, readTimeHours, year, pinTop, draft, body |
 | **book-review** | category, title, slug, pubDate, slugId, bookSlug | rating, description, image, cover, tags, pinTop, draft, body |
 | **column** | category, title, slug | description, icon, image, cover, tags, pubDate, pinTop, draft, body |
 | **article** | category, title, slug, link, pubDate | description, image, cover, tags, pinTop, draft, body |
@@ -115,6 +115,7 @@ tags: [好文]
 - `pubDate` 格式 `YYYY-MM-DD`
 - `tags` 是数组（可多选）
 - `bookSlug` 必须指向已存在的 books 目录
+- `readTimeHours` 以小时填写，支持非负小数，例如 60 分钟填 `1`、90 分钟填 `1.5`、480 分钟填 `8`；未知时省略。
 
 ## 3. 怎么本地测试（不开 issue）
 

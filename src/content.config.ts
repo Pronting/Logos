@@ -49,7 +49,7 @@ const booksCollection = defineCollection({
         summary: z.string().optional().default(''),
         briefComment: z.string().optional().default(''),
         readDate: z.date().optional(),
-        readTimeMinutes: z.number().int().nonnegative().optional(),
+        readTimeHours: z.number().nonnegative().optional(),
         year: z.number().int().optional(),
         pinTop: z.number().int().optional().default(0),
         draft: z.boolean().optional().default(false),

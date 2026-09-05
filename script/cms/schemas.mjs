@@ -36,7 +36,7 @@ export const bookPayload = z.object({
   summary: z.string().optional().default(''),
   briefComment: z.string().optional().default(''),
   readDate: z.string().regex(dateRe).optional(),
-  readTimeMinutes: z.number().int().nonnegative().optional(),
+  readTimeHours: z.number().nonnegative().optional(),
   year: z.number().int().optional(),
   pinTop: z.number().int().nonnegative().optional().default(0),
   draft: z.boolean().optional().default(false),
