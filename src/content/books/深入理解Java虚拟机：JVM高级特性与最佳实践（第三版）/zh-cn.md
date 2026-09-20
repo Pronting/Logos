@@ -10,7 +10,7 @@ summary: "这是一部从工作原理和工程实践两个维度深入剖析JVM�
 briefComment: "Java程序员必读书籍，大厂JVM解决方案都是基于这本书的"
 readDate: 2024-11-01
 readTimeHours: 8
-year: 2021
+year: 2023
 pinTop: 1
 ---
 

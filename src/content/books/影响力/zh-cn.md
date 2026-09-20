@@ -8,7 +8,7 @@ summary: "心理学家罗伯特·西奥迪尼为我们解释了为什么有些�
 briefComment: "辞藻严重，例子不太具有代表性。本书解释了互惠，喜好，社会认同，权威看法"
 readDate: 2025-11-01
 readTimeHours: 8
-year: 2021
+year: 2026
 pinTop: 1
 ---
 

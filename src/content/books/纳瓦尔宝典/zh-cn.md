@@ -8,7 +8,7 @@ summary: "致富不是靠运气，幸福也不是从天而降的。积累财富�
 briefComment: "加杠杆，时薪来衡量时间的价值，何为幸福？何为财富？何为自我管理，纳瓦尔会给出答案"
 readDate: 2026-04-01
 readTimeHours: 8
-year: 2021
+year: 2026
 pinTop: 1
 ---
 

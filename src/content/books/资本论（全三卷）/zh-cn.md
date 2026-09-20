@@ -8,7 +8,7 @@ summary: "《资本论》是马克思理论的集大成之作，也是一部划�
 briefComment: "了解世界原理不可不读的一本书，资本产生的过程，商品价值抽象这些，全书很抽象，需要配合ai深入理解"
 readDate: 2025-11-01
 readTimeHours: 39
-year: 2021
+year: 2025
 pinTop: 1
 ---
 
