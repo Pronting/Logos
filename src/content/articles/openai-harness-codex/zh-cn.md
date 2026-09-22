@@ -1,8 +1,8 @@
 ---
 title: "工程技术：在智能体优先的世界中利用 Codex"
-description: openai 的harness框架演变，多agent架构真的很重要，全链路可观测性也是必须的
+description: AI native 的先驱者，全链路 AI 化 
 link: https://openai.com/zh-Hans-CN/index/harness-engineering/
-pubDate: 2026-06-10
+pubDate: 2026-03-09
 tags: [解决方案, harness]
 draft: false
 pinTop: 0

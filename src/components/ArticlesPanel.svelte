@@ -9,13 +9,37 @@
   export let currentLang = "zh-cn";
 
   const UNTAGGED = 'undefined';
+  const VIEW_STORAGE_KEY = 'articles-view-mode';
+  const VIEW_CARD = 'card';
+  const VIEW_COMPACT = 'compact';
 
   function getArticleTags(article) {
     return Array.isArray(article.data.tags) ? article.data.tags : [];
   }
 
+  // 读取本地保存的显示方式，默认完整信息
+  function readStoredView() {
+    try {
+      if (typeof window === 'undefined') return VIEW_CARD;
+      return window.localStorage.getItem(VIEW_STORAGE_KEY) === VIEW_COMPACT ? VIEW_COMPACT : VIEW_CARD;
+    } catch {
+      return VIEW_CARD;
+    }
+  }
+
   let selectedTags = [];
+  let viewMode = readStoredView();
   const t = i18nit(currentLang);
+
+  function setViewMode(mode) {
+    if (viewMode === mode) return;
+    viewMode = mode;
+    try {
+      window.localStorage.setItem(VIEW_STORAGE_KEY, mode);
+    } catch {
+      // 忽略隐私模式等存储不可用的情况
+    }
+  }
 
   // 统计每个 tag 的文章数量
   $: tagCounts = (() => {
@@ -135,9 +159,67 @@
     <p class="text-[var(--text-color-70)] font-bold">{t("cover.subTitle.articlesCount", { count: filteredArticles.length })}</p>
   </div>
 
+  <!-- 显示方式切换 -->
+  <div class="max-w-[var(--page-width)] mx-auto pb-5 flex items-center justify-end">
+    <div
+      class="inline-flex items-center gap-0.5 rounded-lg border border-[var(--button-border-color)] p-0.5"
+      role="group"
+      aria-label={t("articles.viewMode")}
+    >
+      <button
+        type="button"
+        on:click={() => setViewMode(VIEW_CARD)}
+        aria-pressed={viewMode === VIEW_CARD}
+        title={t("articles.viewCard")}
+        class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-md transition-colors duration-200 ease-in-out
+        {viewMode === VIEW_CARD
+          ? 'bg-[var(--link-color)] text-white'
+          : 'text-[var(--text-color-70)] hover:text-[var(--link-color)] hover:bg-[var(--button-hover-color)]'}"
+      >
+        <Icon icon="fa6-solid:table-list" class="text-[11px]" />
+        <span>{t("articles.viewCard")}</span>
+      </button>
+      <button
+        type="button"
+        on:click={() => setViewMode(VIEW_COMPACT)}
+        aria-pressed={viewMode === VIEW_COMPACT}
+        title={t("articles.viewCompact")}
+        class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-md transition-colors duration-200 ease-in-out
+        {viewMode === VIEW_COMPACT
+          ? 'bg-[var(--link-color)] text-white'
+          : 'text-[var(--text-color-70)] hover:text-[var(--link-color)] hover:bg-[var(--button-hover-color)]'}"
+      >
+        <Icon icon="fa6-solid:list-ul" class="text-[11px]" />
+        <span>{t("articles.viewCompact")}</span>
+      </button>
+    </div>
+  </div>
+
   <!-- 文章列表 -->
   <div class="pb-16" id="articles-content">
     {#if filteredArticles.length > 0}
+      {#if viewMode === VIEW_COMPACT}
+        <!-- 紧凑型列表：仅显示标题 -->
+        <div class="rounded-xl shadow border border-[var(--button-border-color)] overflow-hidden divide-y divide-[var(--button-border-color)]">
+          {#each filteredArticles as article (article.id)}
+            <div animate:flip={{ duration: 400 }} in:fade={{ duration: 150 }} out:fade={{ duration: 150 }}>
+              <a
+                href={article.data.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={article.data.title}
+                class="group flex items-center gap-2 min-w-0 w-full px-5 py-3 transition-colors duration-200 ease-in-out hover:bg-[var(--button-hover-color)]"
+              >
+                <span class="flex-1 min-w-0 truncate text-[0.95rem] text-[var(--text-color)] group-hover:text-[var(--link-color)] transition-colors duration-200 ease-in-out">{article.data.title}</span>
+                <Icon
+                  icon="fa6-solid:arrow-up-right-from-square"
+                  class="shrink-0 text-[10px] text-[var(--text-color-70)] opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out"
+                />
+              </a>
+            </div>
+          {/each}
+        </div>
+      {:else}
       <div class="grid grid-cols-1 gap-6">
         {#each filteredArticles as article (article.id)}
           <div animate:flip={{ duration: 400 }} in:fade={{ duration: 150 }} out:fade={{ duration: 150 }}>
@@ -199,6 +281,7 @@
           </div>
         {/each}
       </div>
+      {/if}
     {:else}
       <div class="text-center py-16 text-[var(--text-color-70)]">
         <p class="text-lg">{t("articles.noResults")}</p>

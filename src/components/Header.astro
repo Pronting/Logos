@@ -38,6 +38,7 @@ const techPage = getRelativeLocaleUrl(currentLang, "/tech/");
 const bookReviewPage = getRelativeLocaleUrl(currentLang, "/book-review/");
 const bookshelfPage = getRelativeLocaleUrl(currentLang, "/bookshelf/");
 const articlesPage = getRelativeLocaleUrl(currentLang, "/articles/");
+const harnessKitPage = getRelativeLocaleUrl(currentLang, "/harness-kit/");
 const friendsPage = getRelativeLocaleUrl(currentLang, "/friends/");
 const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
 
@@ -134,21 +135,14 @@ if (profileConfig.indexPage) {
               }`}>
               {t("header.tech")}
           </a>
-          <!-- 书评链接 -->
-          <a href={ bookReviewPage } class={`transition-colors rounded-lg px-3 py-1 mx-1 hover:text-current ${
-              Astro.url.pathname.startsWith('/book-review')
-                  ? 'bg-[var(--button-hover-color)]'
-                  : 'hover:bg-[var(--button-hover-color)]'
-              }`}>
-              {t("header.bookReview")}
-          </a>
-          <!-- 书架链接 -->
+          <!-- 书架链接（书评已作为子标签） -->
           <a href={ bookshelfPage } class={`transition-colors rounded-lg px-3 py-1 mx-1 hover:text-current ${
               Astro.url.pathname.startsWith('/bookshelf')
                   ? 'bg-[var(--button-hover-color)]'
                   : 'hover:bg-[var(--button-hover-color)]'
               }`}>
               {t("header.bookshelf")}
+          </a>
           <!-- 好文链接 -->
           <a href={ articlesPage } class={`transition-colors rounded-lg px-3 py-1 mx-1 hover:text-current ${
               Astro.url.pathname.startsWith('/articles')
@@ -156,6 +150,14 @@ if (profileConfig.indexPage) {
                   : 'hover:bg-[var(--button-hover-color)]'
               }`}>
               {t("header.articles")}
+          </a>
+          <!-- Harness Kit 链接 -->
+          <a href={ harnessKitPage } class={`transition-colors rounded-lg px-3 py-1 mx-1 hover:text-current ${
+              Astro.url.pathname.startsWith('/harness-kit')
+                  ? 'bg-[var(--button-hover-color)]'
+                  : 'hover:bg-[var(--button-hover-color)]'
+              }`}>
+              {t("header.harnessKit")}
           </a>
           <!-- 关于链接 -->
           <a href={ aboutPage } class={`transition-colors rounded-lg px-3 py-1 mx-1 hover:text-current ${
@@ -201,16 +203,17 @@ if (profileConfig.indexPage) {
                 <Icon name="fa6-solid:laptop-code" class="w-4 h-4 opacity-70" />
                 <span>{t("header.tech")}</span>
             </a>
-            <a href={ bookReviewPage } class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[var(--button-hover-color)] hover:text-[var(--link-color)] transition-colors active:bg-[var(--button-hover-color)] active:text-[var(--link-color)]">
-                <Icon name="fa6-solid:book-open" class="w-4 h-4 opacity-70" />
-                <span>{t("header.bookReview")}</span>
-            </a>
             <a href={ bookshelfPage } class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[var(--button-hover-color)] hover:text-[var(--link-color)] transition-colors active:bg-[var(--button-hover-color)] active:text-[var(--link-color)]">
                 <Icon name="fa6-solid:bookmark" class="w-4 h-4 opacity-70" />
                 <span>{t("header.bookshelf")}</span>
+            </a>
             <a href={ articlesPage } class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[var(--button-hover-color)] hover:text-[var(--link-color)] transition-colors active:bg-[var(--button-hover-color)] active:text-[var(--link-color)]">
-                <Icon name="fa6-solid:bookmark" class="w-4 h-4 opacity-70" />
+                <Icon name="fa6-solid:newspaper" class="w-4 h-4 opacity-70" />
                 <span>{t("header.articles")}</span>
+            </a>
+            <a href={ harnessKitPage } class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[var(--button-hover-color)] hover:text-[var(--link-color)] transition-colors active:bg-[var(--button-hover-color)] active:text-[var(--link-color)]">
+                <Icon name="fa6-solid:toolbox" class="w-4 h-4 opacity-70" />
+                <span>{t("header.harnessKit")}</span>
             </a>
             <a href={ aboutPage } class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[var(--button-hover-color)] hover:text-[var(--link-color)] transition-colors active:bg-[var(--button-hover-color)] active:text-[var(--link-color)]">
                 <Icon name="fa6-solid:user" class="w-4 h-4 opacity-70" />

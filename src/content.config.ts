@@ -90,6 +90,26 @@ const articlesCollection = defineCollection({
     }),
 })
 
+// Harness Kit：skills / commands / MCP 等智能体工具条目
+const harnessCollection = defineCollection({
+    loader: glob({ pattern: '**/[^_]*.md', base: "./src/content/harness" }),
+    schema: z.object({
+        title: z.string(),
+        description: z.string().optional().default(''),
+        // 类型保持开放：skill / command / agent / mcp / prompt / workflow / other
+        type: z.string().optional().default('other'),
+        link: z.string().optional().default(''),
+        source: z.string().optional().default(''),
+        author: z.string().optional().default(''),
+        version: z.string().optional().default(''),
+        icon: z.string().optional(),
+        tags: z.array(z.string()).optional(),
+        pubDate: z.date().optional(),
+        pinTop: z.number().int().optional().default(0),
+        draft: z.boolean().optional().default(false),
+    }),
+})
+
 export const collections = {
     blog: blogCollection,
     spec: specCollection,
@@ -97,4 +117,5 @@ export const collections = {
     bookReview: bookReviewCollection,
     columns: columnsCollection,
     articles: articlesCollection,
+    harness: harnessCollection,
 }

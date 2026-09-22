@@ -1,8 +1,8 @@
 ---
 title: Spring IOC 容器源码分析
-description: 史上无敌详细
+description: 巨详细，阅读难度很大
 link: https://javadoop.com/post/spring-ioc
-pubDate: 2026-06-10
+pubDate: 2024-05-15
 tags: [底层]
 draft: false
 pinTop: 0

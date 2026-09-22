@@ -8,6 +8,7 @@ const translation: Translation = {
         bookReview: "书评",
         bookshelf: "书架",
         articles: "好文",
+        harnessKit: "Harness Kit",
         about: "关于",
         friends: "友链",
     },
@@ -19,6 +20,7 @@ const translation: Translation = {
             bookReview: "书评",
             bookshelf: "书架",
             articles: "好文",
+            harnessKit: "Harness Kit",
             about: "关于",
             friends: "友链",
         },
@@ -30,6 +32,7 @@ const translation: Translation = {
             bookshelf: "博学而笃志，切问而近思",
             articles: "分享互联网上的好文章",
             articlesCount: "共收录 {count} 篇好文",
+            harnessKit: "智能体时代的技能与工具箱",
             about: "一个极简的Blog模板",
             friends: "有趣的灵魂",
         }
@@ -156,6 +159,7 @@ const translation: Translation = {
     },
     bookReview: {
         relatedBook: "所属书籍",
+        reviewCount: "共 {count} 篇书评",
     },
     themeInfo: {
         light: "切换到 浅色 模式",
@@ -185,7 +189,28 @@ const translation: Translation = {
     },
     articles: {
         noResults: "暂无好文推荐",
-    }
+        viewMode: "显示方式",
+        viewCard: "完整信息",
+        viewCompact: "紧凑列表",
+    },
+    harness: {
+        searchPlaceholder: "搜索技能、命令或工具...",
+        filterType: "类型",
+        typeAll: "全部",
+        empty: "内容整理中",
+        emptyHint: "这里将收录 Skills、Commands、Workflows、MCP 等实用工具",
+        noResults: "未找到相关内容",
+        docs: "查看",
+        types: {
+            skill: "技能",
+            command: "命令",
+            agent: "智能体",
+            mcp: "MCP",
+            prompt: "提示词",
+            workflow: "工作流",
+            other: "其他",
+        },
+    },
 }
 
 export default translation;

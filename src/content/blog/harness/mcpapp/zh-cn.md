@@ -1,5 +1,5 @@
 ---
-title: 第一次落地 MCP APP，可视化效果是他不错的加分项
+title: 第一次写 MCP APP，然后接入到 Goose 中
 pubDate: 2026-08-03
 slugId: mcp-app
 description: 简单介绍mcpapp,以及mcpapp 介入到mcp客户端并成功跑通
@@ -16,3 +16,5 @@ tags: [harness]
 
 使用下面的 skybridge 开发, [快速开始](https://docs.skybridge.tech/get-started/introduction)
 ::github{repo="alpic-ai/skybridge"}
+
+这个天桥框架是开源的一个MCP APP框架

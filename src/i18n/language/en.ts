@@ -8,6 +8,7 @@ const translation: Translation = {
         bookReview: "Book Review",
         bookshelf: "Bookshelf",
         articles: "Articles",
+        harnessKit: "Harness Kit",
         about: "About",
         friends: "Friends",
     },
@@ -19,6 +20,7 @@ const translation: Translation = {
             bookReview: "Book Review",
             bookshelf: "Bookshelf",
             articles: "Articles",
+            harnessKit: "Harness Kit",
             about: "About",
             friends: "Friends",
         },
@@ -30,6 +32,7 @@ const translation: Translation = {
             bookshelf: "Read widely, think deeply",
             articles: "Curated good reads from the web",
             articlesCount: "{count} curated articles",
+            harnessKit: "Skills and tooling for the agent era",
             about: "A minimalist blog template",
             friends: "Interesting Souls",
         }
@@ -156,6 +159,7 @@ const translation: Translation = {
     },
     bookReview: {
         relatedBook: "Related Book",
+        reviewCount: "{count} reviews in total",
     },
     themeInfo: {
         light: "Switch to Light Mode",
@@ -185,7 +189,28 @@ const translation: Translation = {
     },
     articles: {
         noResults: "No curated articles yet",
-    }
+        viewMode: "View",
+        viewCard: "Full",
+        viewCompact: "Compact",
+    },
+    harness: {
+        searchPlaceholder: "Search skills, commands or tools...",
+        filterType: "Type",
+        typeAll: "All",
+        empty: "Coming soon",
+        emptyHint: "Skills, commands, workflows and MCP tooling will be collected here",
+        noResults: "Nothing found",
+        docs: "Open",
+        types: {
+            skill: "Skill",
+            command: "Command",
+            agent: "Agent",
+            mcp: "MCP",
+            prompt: "Prompt",
+            workflow: "Workflow",
+            other: "Other",
+        },
+    },
 }
 
 export default translation;

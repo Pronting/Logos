@@ -1,6 +1,6 @@
 ---
 title: "Harness design for long-running application development"
-description: a社的vibe技术
+description: Anthropic 的长任务 Harness 设计思路，对我有很大震撼
 link: https://www.anthropic.com/engineering/harness-design-long-running-apps
 pubDate: 2026-06-10
 tags: [解决方案, harness]

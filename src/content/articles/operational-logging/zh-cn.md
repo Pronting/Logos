@@ -1,5 +1,5 @@
 ---
-title: 如何优雅地记录操作日志?
+title: 美团是如何优雅地记录操作日志?
 description: 日志上下游记录
 link: https://tech.meituan.com/2021/09/16/operational-logbook.html
 pubDate: 2026-06-10

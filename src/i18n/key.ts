@@ -6,6 +6,7 @@ export interface Translation {
         bookReview: string;
         bookshelf: string;
         articles: string;
+        harnessKit: string;
         about: string;
         friends: string;
     };
@@ -17,6 +18,7 @@ export interface Translation {
             bookReview: string;
             bookshelf: string;
             articles: string;
+            harnessKit: string;
             about: string;
             friends: string;
         };
@@ -28,6 +30,7 @@ export interface Translation {
             bookshelf: string;
             articles: string;
             articlesCount: string;
+            harnessKit: string;
             about: string;
             friends: string;
         };
@@ -154,6 +157,7 @@ export interface Translation {
     };
     bookReview: {
         relatedBook: string;
+        reviewCount: string;
     };
     themeInfo: {
         light: string;
@@ -183,5 +187,26 @@ export interface Translation {
     },
     articles: {
         noResults: string;
-    }
+        viewMode: string;
+        viewCard: string;
+        viewCompact: string;
+    };
+    harness: {
+        searchPlaceholder: string;
+        filterType: string;
+        typeAll: string;
+        empty: string;
+        emptyHint: string;
+        noResults: string;
+        docs: string;
+        types: {
+            skill: string;
+            command: string;
+            agent: string;
+            mcp: string;
+            prompt: string;
+            workflow: string;
+            other: string;
+        };
+    };
 }
