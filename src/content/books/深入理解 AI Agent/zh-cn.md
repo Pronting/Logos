@@ -1,5 +1,5 @@
 ---
-title: "深入AI Agent"
+title: "深入理解 AI Agent"
 author: "李博杰"
 cover: "https://pront-base-1318237185.cos.ap-guangzhou.myqcloud.com//picgo20260923225607472.png"
 tags: ["技术读物"]
