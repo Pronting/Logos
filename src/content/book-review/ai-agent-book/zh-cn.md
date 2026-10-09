@@ -6,7 +6,7 @@ tags: ["书评", "AI Agent", "人工智能"]
 bookSlug: "深入理解-ai-agent"
 showCover: false
 pinTop: 0
-draft: true
+draft: false
 ---
 
 
